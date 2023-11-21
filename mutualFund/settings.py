@@ -152,8 +152,8 @@ SIMPLE_JWT = {
 # reset password link valid
 PASSWORD_RESET_TIMEOUT=900
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:9000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST='smtp.gmail.com'
