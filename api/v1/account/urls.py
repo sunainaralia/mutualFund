@@ -16,6 +16,9 @@ from api.v1.account.views import (
     GetAllUserAdharDetail,
     PostUserAdharDetail,
     ChangeUserAdharDetails,
+    PostUserSipDetail,
+    GetAllUserSipDetail,
+    ChangeUserSipDetails,
 )
 
 urlpatterns = [
@@ -35,4 +38,7 @@ urlpatterns = [
     path("adharall/", GetAllUserAdharDetail.as_view()),
     path("adharpost/", PostUserAdharDetail.as_view()),
     path("changeadhar/<pk>/", ChangeUserAdharDetails.as_view()),
+    path("sippost/", PostUserSipDetail.as_view()),
+    path("sipall/", GetAllUserSipDetail.as_view()),
+    path("changesip/", ChangeUserSipDetails.as_view()),
 ]

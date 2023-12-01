@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import User, UserBasicDetail, PanVerification, AdharCardVerify
+from .models import (
+    User,
+    UserBasicDetail,
+    PanVerification,
+    AdharCardVerify,
+    UserSipDetails,
+)
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework.authentication import authenticate
@@ -140,3 +146,17 @@ class UserAdharVerification(serializers.ModelSerializer):
     class Meta:
         model = AdharCardVerify
         fields = ["id", "adhar_card_front", "adhar_no", "adhar_card_back"]
+
+
+# serializer for sip details
+class UserSipDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserSipDetails
+        fields = [
+            "id",
+            "sip_list",
+            "invested_amount",
+            "member_status",
+            "gain_value",
+            "user ",
+        ]

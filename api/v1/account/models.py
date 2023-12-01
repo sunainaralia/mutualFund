@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from api.v1.mutual_sip.models import SIP
 from django.contrib.auth.models import (
     BaseUserManager,
     AbstractBaseUser,
@@ -56,6 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     referral_code = models.CharField(max_length=20, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_blocked = models.BooleanField(default=False)
     objects = UserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["password"]
@@ -71,12 +73,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 # basic details
 class UserBasicDetail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
     nationality = models.CharField(max_length=40)
     fullName = models.CharField(max_length=50)
     d_o_b = models.DateField()
     address_details = models.TextField()
     zip_code = models.CharField(max_length=10)
     state = models.CharField(max_length=20)
+
     REQUIRED_FIELDS = [
         "nationality",
         "company",
@@ -102,3 +106,18 @@ class AdharCardVerify(models.Model):
     adhar_card_front = models.ImageField(upload_to="user_image", max_length=300)
     adhar_card_back = models.ImageField(upload_to="user_image", max_length=300)
     adhar_no = models.CharField(max_length=10)
+
+
+# sip details
+class UserSipDetails(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    sip_list = models.ManyToManyField(SIP)
+    invested_amount = models.FloatField(default=0.0)
+    member_status = models.CharField(max_length=100, default="active")
+    gain_value = models.FloatField(default=0.0, null=True)
+
+    # def sip(self):
+    #     x = []
+    #     for i in self.user.all():
+    #         x.append(i)
+    #     return x
