@@ -54,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     phone_no = models.CharField(max_length=12)
-    referral_code = models.CharField(max_length=20, null=True)
+    referral_code = models.CharField(max_length=20, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_blocked = models.BooleanField(default=False)
@@ -116,14 +116,43 @@ class UserSipDetails(models.Model):
         related_name="sip_details",
         on_delete=models.CASCADE,
         null=True,
-        primary_key=True,
+        blank=True,
     )
     invested_amount = models.FloatField(default=0.0)
     member_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0, null=True)
 
-    def sip_list(self):
-        x = []
-        for i in self.sips().all():
-            x.append(i)
-        return x
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.sips:
+            self.sips.update_no_of_investors()
+
+
+# class UserSipDetails(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     sips = models.ForeignKey(
+#         SIP,
+#         related_name="sip_details",
+#         on_delete=models.CASCADE,
+#         null=True,
+#         blank=True,
+#     )
+#     invested_amount = models.FloatField(default=0.0)
+#     member_status = models.CharField(max_length=100, default="active")
+#     gain_value = models.FloatField(default=0.0, null=True)
+
+#     def save(self, *args, **kwargs):
+#         super().save(*args, **kwargs)
+#         if self.sips:
+#             self.sips.update_no_of_investors()
+
+#     # Add this method to handle updates from SIP model
+#     @classmethod
+#     def update_from_sip(cls, sip_instance, **kwargs):
+#         user_sip_details, created = cls.objects.get_or_create(
+#             sips=sip_instance, defaults=kwargs
+#         )
+#         if not created:
+#             for key, value in kwargs.items():
+#                 setattr(user_sip_details, key, value)
+#             user_sip_details.save()

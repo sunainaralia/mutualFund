@@ -1,11 +1,18 @@
+# admin.py
+
 from django.contrib import admin
-
 from .models import SIP
+from api.v1.account.models import UserSipDetails
 
 
-# Register your models here.
-class SipAdmin(admin.ModelAdmin):
+class UserSipDetailsInline(admin.TabularInline):
+    model = UserSipDetails
+    extra = 1
+
+
+class SIPAdmin(admin.ModelAdmin):
     list_display = [
+        "id",
         "name",
         "current_annual_return_rate",
         "min_amount",
@@ -16,10 +23,16 @@ class SipAdmin(admin.ModelAdmin):
         "investment_type",
         "sip_status",
         "gain_value",
-        "sip_users",
         "no_of_investors",
-        "users",
+        "usernames_of_users_taken",
     ]
 
+    inlines = [UserSipDetailsInline]
 
-admin.site.register(SIP, SipAdmin)
+    def usernames_of_users_taken(self, obj):
+        return ", ".join(user.user.username for user in obj.sip_details.all())
+
+    usernames_of_users_taken.short_description = "Usernames of Users Taken"
+
+
+admin.site.register(SIP, SIPAdmin)
