@@ -112,8 +112,18 @@ class AdharCardVerify(models.Model):
 class UserSipDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     sips = models.ForeignKey(
-        SIP, related_name="users_sip_details", on_delete=models.CASCADE, null=True
+        SIP,
+        related_name="sip_details",
+        on_delete=models.CASCADE,
+        null=True,
+        primary_key=True,
     )
     invested_amount = models.FloatField(default=0.0)
     member_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0, null=True)
+
+    def sip_list(self):
+        x = []
+        for i in self.sips().all():
+            x.append(i)
+        return x

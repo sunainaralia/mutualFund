@@ -14,7 +14,6 @@ from rest_framework.permissions import IsAuthenticated
 #  post sip
 class PostSip(APIView):
     renderer_classes = [UserRenderers]
-    # permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
         serializer = SIPSerializer(data=request.data)
@@ -36,16 +35,18 @@ class GetAllSip(APIView):
 
     def get(self, request, format=None):
         data = SIP.objects.all()
-        serializer = SIPSerializer(data, many=True)
-        return Response(
-            {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-        )
+        if data:
+            serializer = SIPSerializer(data, many=True)
+            return Response(
+                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+            )
+        else:
+            return Response({"success": False}, status=status.HTTP_204_NO_CONTENT)
 
 
 # change user's sip details
 class ChangeSip(APIView):
     renderer_classes = [UserRenderers]
-    # permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk, format=None):
         data = SIP.objects.get(pk=pk)

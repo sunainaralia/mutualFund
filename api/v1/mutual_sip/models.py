@@ -10,6 +10,7 @@ class SIP(models.Model):
         related_name="sip_list",
         on_delete=models.CASCADE,
         null=True,
+        primary_key=True
     )
     name = models.CharField(max_length=255)
     current_annual_return_rate = models.FloatField(default=0.0)
@@ -24,4 +25,7 @@ class SIP(models.Model):
     gain_value = models.FloatField(default=0.0)
 
     def sip_users(self):
-        return self.users.all()
+        x = []
+        for i in self.users().all():
+            x.append(i)
+        return x

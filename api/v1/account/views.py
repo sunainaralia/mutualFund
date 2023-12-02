@@ -61,33 +61,40 @@ class UserLogin(APIView):
         email = serializer.data.get("email")
         password = serializer.data.get("password")
         user = authenticate(email=email, password=password)
-        if user is not None:
-            details = User.objects.get(email=email)
-            user_detail = {
-                "username": details.username,
-                "email": details.email,
-                "id": details.id,
-                "phone_no": details.phone_no,
-                "referral_code": details.referral_code,
-            }
-            token = get_tokens_for_user(user)
-            return Response(
-                {
-                    "success": True,
-                    "msg": "login user successfully",
-                    "token": token,
-                    "user": user_detail,
-                },
-                status=status.HTTP_200_OK,
-            )
+        if user.is_blocked == False:
+            if user is not None:
+                details = User.objects.get(email=email)
+                user_detail = {
+                    "username": details.username,
+                    "email": details.email,
+                    "id": details.id,
+                    "phone_no": details.phone_no,
+                    "referral_code": details.referral_code,
+                }
+                token = get_tokens_for_user(user)
+                return Response(
+                    {
+                        "success": True,
+                        "msg": "login user successfully",
+                        "token": token,
+                        "user": user_detail,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {
+                        "errors": {
+                            "non_field_errors": ["your email or password is not valid"]
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         else:
             return Response(
-                {
-                    "errors": {
-                        "non_field_errors": ["your email or password is not valid"]
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+                {"errors": {"non_field_errors": ["you are blocked"]}},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
 

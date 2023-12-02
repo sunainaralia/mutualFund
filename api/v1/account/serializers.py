@@ -24,6 +24,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             "phone_no",
             "referral_code",
             "profile_photo",
+            "is_blocked",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 

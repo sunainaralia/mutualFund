@@ -18,7 +18,15 @@ class UserAdmin(BaseUserAdmin):
         (None, {"fields": ["email", "password"]}),
         (
             "Personal info",
-            {"fields": ["username", "phone_no", "referral_code", "profile_photo"]},
+            {
+                "fields": [
+                    "username",
+                    "phone_no",
+                    "referral_code",
+                    "profile_photo",
+                    "is_blocked",
+                ]
+            },
         ),
         ("Permissions", {"fields": ["is_admin"]}),
     ]
@@ -86,6 +94,7 @@ class UserSipAdmin(admin.ModelAdmin):
         "gain_value",
         "user",
         "sips",
+        "sip_list",
     ]
 
 
