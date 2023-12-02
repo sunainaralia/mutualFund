@@ -85,6 +85,7 @@ class UserSipAdmin(admin.ModelAdmin):
         "member_status",
         "gain_value",
         "user",
+        "sips",
     ]
 
 

@@ -18,6 +18,7 @@ class SipAdmin(admin.ModelAdmin):
         "gain_value",
         "sip_users",
         "no_of_investors",
+        "users",
     ]
 
 
