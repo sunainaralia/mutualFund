@@ -154,9 +154,9 @@ class UserSipDetailsSerializer(serializers.ModelSerializer):
         model = UserSipDetails
         fields = [
             "id",
-            "sip_list",
+            "sips",
             "invested_amount",
             "member_status",
             "gain_value",
-            "user ",
+            "user",
         ]

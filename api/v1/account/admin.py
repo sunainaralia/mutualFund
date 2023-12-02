@@ -81,11 +81,10 @@ admin.site.register(AdharCardVerify, UserAdharDetailAdmin)
 class UserSipAdmin(admin.ModelAdmin):
     list_display = [
         "id",
-        # "sip_list",
         "invested_amount",
         "member_status",
         "gain_value",
-        # "user ",
+        "user",
     ]
 
 

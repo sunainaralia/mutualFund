@@ -7,16 +7,16 @@ class SIPSerializer(serializers.ModelSerializer):
         model = SIP
         fields = (
             "id",
-            "user",
+            "users",
             "name",
             "current_annual_return_rate",
             "min_amount",
             "current_value",
             "time_period",
             "created_at",
-            "no_of_investers",
             "total_investment",
             "investment_type",
             "sip_status",
             "gain_value",
+            "no_of_investors",
         )
