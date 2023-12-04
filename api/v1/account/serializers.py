@@ -90,18 +90,15 @@ class SendResetPasswordEmailSerializer(serializers.Serializer):
         email = attrs.get("email")
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
-            # uid = urlsafe_base64_encode(force_bytes(user.id))
-            # token = PasswordResetTokenGenerator().make_token(user)
             otp = random.randrange(100000, 1000000)
             link = str(otp)
             body = "Your Otp is:" + link
-            print(otp)
-
             data = {
                 "subject": "Reset your password",
                 "body": body,
                 "to_email": user.email,
                 "otp": otp,
+                "id": user.id,
             }
             Util.send_email(data)
             return data

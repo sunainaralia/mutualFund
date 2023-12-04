@@ -133,8 +133,14 @@ class SendPasswordResetEmail(APIView):
     def post(self, request, **kwargs):
         serializer = SendResetPasswordEmailSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
+            otp = serializer.validated_data.get("otp")
+            user_id = serializer.validated_data.get("id")
             return Response(
-                {"msg": "password reset link is sent to your registered email"},
+                {
+                    "msg": "password reset link is sent to your registered email",
+                    "otp": otp,
+                    "user_id": user_id,
+                },
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
