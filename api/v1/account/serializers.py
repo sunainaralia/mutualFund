@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import random
 from .models import (
     User,
     UserBasicDetail,
@@ -53,6 +54,32 @@ class UserChangePasswordSerializer(serializers.Serializer):
 
 
 # serializer for send password reset email
+# class SendResetPasswordEmailSerializer(serializers.Serializer):
+#     email = serializers.EmailField(max_length=255)
+
+#     class Meta:
+#         fields = ["email"]
+
+#     def validate(self, attrs):
+#         email = attrs.get("email")
+#         if User.objects.filter(email=email).exists():
+#             user = User.objects.get(email=email)
+#             uid = urlsafe_base64_encode(force_bytes(user.id))
+#             token = PasswordResetTokenGenerator().make_token(user)
+#             link = "http://localhost:3000/api/user/reset/" + uid + "/" + token
+#             body = "click following link to reset your password" + link
+#             print(body)
+#             data = {
+#                 "subject": "Reset your password",
+#                 "body": body,
+#                 "to_email": user.email,
+#             }
+#             Util.send_email(data)
+#             return attrs
+#         else:
+#             raise serializers.ValidationError("this email is not registered")
+
+
 class SendResetPasswordEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255)
 
@@ -63,46 +90,51 @@ class SendResetPasswordEmailSerializer(serializers.Serializer):
         email = attrs.get("email")
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
-            uid = urlsafe_base64_encode(force_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            link = "http://localhost:3000/api/user/reset/" + uid + "/" + token
-            body = "click following link to reset your password" + link
-            print(body)
+            # uid = urlsafe_base64_encode(force_bytes(user.id))
+            # token = PasswordResetTokenGenerator().make_token(user)
+            otp = random.randrange(100000, 1000000)
+            link = str(otp)
+            body = "Your Otp is:" + link
+            print(otp)
+
             data = {
                 "subject": "Reset your password",
                 "body": body,
                 "to_email": user.email,
+                "otp": otp,
             }
             Util.send_email(data)
-            return attrs
+            return data
         else:
-            raise serializers.ValidationError("this email is not registered")
+            raise serializers.ValidationError("This email is not registered")
 
 
 # password reset serializer
 class UserResetPasswordSerializer(serializers.Serializer):
     password1 = serializers.CharField(style={"input_type": "password"}, write_only=True)
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
+    otp = serializers.CharField()
 
     class Meta:
-        fields = ["password1", "password2"]
+        fields = ["password1", "password2", "otp"]
 
     def validate(self, attrs):
         password1 = attrs.get("password1")
         password2 = attrs.get("password2")
-        uid = self.context.get("uid")
-        token = self.context.get("token")
-        id = smart_str(urlsafe_base64_decode(uid))
-        user = User.objects.get(id=id)
-        if password1 != password2:
-            raise serializers.ValidationError(
-                "password and confirm password are not matched"
-            )
-        if not PasswordResetTokenGenerator().check_token(user, token):
-            raise serializers.ValidationError("token is expired or not valid")
-        user.set_password(password1)
-        user.save()
-        return attrs
+        otp = attrs.get("otp")
+        id = self.context.get("id")
+        validate_otp = self.context.get("otp")
+        if otp == validate_otp:
+            user = User.objects.get(id=id)
+            if password1 != password2:
+                raise serializers.ValidationError(
+                    "password and confirm password are not matched"
+                )
+            user.set_password(password1)
+            user.save()
+            return attrs
+        else:
+            raise serializers.ValidationError("invalid otp")
 
 
 # serializer for user profile

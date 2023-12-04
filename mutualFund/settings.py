@@ -29,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "*",
-    "https://1169-2409-40d6-1008-7f27-2949-9dd5-28c7-65a6.ngrok-free.app",
 ]
 
 

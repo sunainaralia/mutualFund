@@ -147,9 +147,9 @@ class SendPasswordResetEmail(APIView):
 class ResetPassword(APIView):
     renderer_classes = [UserRenderers]
 
-    def post(self, request, uid, token, **kwargs):
+    def post(self, request, pk, otp, **kwargs):
         serializer = UserResetPasswordSerializer(
-            data=request.data, context={"uid": uid, "token": token}
+            data=request.data, context={"id": pk, "otp": otp}
         )
         if serializer.is_valid(raise_exception=True):
             return Response(

@@ -26,7 +26,7 @@ urlpatterns = [
     path("login/", UserLogin.as_view()),
     path("changepassword/", UserChangePassword.as_view()),
     path("sendresetemail/", SendPasswordResetEmail.as_view()),
-    path("resetpassword/<uid>/<token>/", ResetPassword.as_view()),
+    path("resetpassword/<pk>/<otp>/", ResetPassword.as_view()),
     path("profile/", UserProfile.as_view()),
     path("changeprofile/<pk>/", ChangeUserProfile.as_view()),
     path("basicall/", GetAllUserBasicDetail.as_view()),
