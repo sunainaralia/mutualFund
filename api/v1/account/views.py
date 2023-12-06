@@ -426,6 +426,7 @@ class PostUserSipDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
+
         serializer = UserSipDetailsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()

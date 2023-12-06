@@ -1,8 +1,11 @@
 from django.db import models
 
+
 class SIP(models.Model):
     users = models.ManyToManyField(
-        "account.UserSipDetails", related_name="sips_taken", null=True, blank=True
+        "account.UserSipDetails",
+        related_name="sips_taken",
+        blank=True,
     )
     name = models.CharField(max_length=255)
     current_annual_return_rate = models.FloatField(default=0.0)
@@ -15,5 +18,3 @@ class SIP(models.Model):
     investment_type = models.CharField(max_length=100)
     sip_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0)
-
-

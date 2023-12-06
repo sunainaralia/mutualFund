@@ -111,14 +111,11 @@ class AdharCardVerify(models.Model):
 # sip details
 class UserSipDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    sips = models.ForeignKey(
+    sips = models.ManyToManyField(
         SIP,
         related_name="sip_details",
-        on_delete=models.CASCADE,
-        null=True,
         blank=True,
     )
     invested_amount = models.FloatField(default=0.0)
     member_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0, null=True)
-

@@ -18,4 +18,5 @@ class SIPSerializer(serializers.ModelSerializer):
             "sip_status",
             "gain_value",
             "no_of_investors",
+            "users",
         )
