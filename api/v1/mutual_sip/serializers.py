@@ -7,7 +7,6 @@ class SIPSerializer(serializers.ModelSerializer):
         model = SIP
         fields = (
             "id",
-            "users",
             "name",
             "current_annual_return_rate",
             "min_amount",

@@ -122,37 +122,3 @@ class UserSipDetails(models.Model):
     member_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0, null=True)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.sips:
-            self.sips.update_no_of_investors()
-
-
-# class UserSipDetails(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     sips = models.ForeignKey(
-#         SIP,
-#         related_name="sip_details",
-#         on_delete=models.CASCADE,
-#         null=True,
-#         blank=True,
-#     )
-#     invested_amount = models.FloatField(default=0.0)
-#     member_status = models.CharField(max_length=100, default="active")
-#     gain_value = models.FloatField(default=0.0, null=True)
-
-#     def save(self, *args, **kwargs):
-#         super().save(*args, **kwargs)
-#         if self.sips:
-#             self.sips.update_no_of_investors()
-
-#     # Add this method to handle updates from SIP model
-#     @classmethod
-#     def update_from_sip(cls, sip_instance, **kwargs):
-#         user_sip_details, created = cls.objects.get_or_create(
-#             sips=sip_instance, defaults=kwargs
-#         )
-#         if not created:
-#             for key, value in kwargs.items():
-#                 setattr(user_sip_details, key, value)
-#             user_sip_details.save()
