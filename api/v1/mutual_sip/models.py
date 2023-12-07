@@ -18,3 +18,4 @@ class SIP(models.Model):
     investment_type = models.CharField(max_length=100)
     sip_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0)
+    sip_photo = models.ImageField(upload_to="user_image", max_length=300,null=True)

@@ -19,4 +19,5 @@ class SIPSerializer(serializers.ModelSerializer):
             "gain_value",
             "no_of_investors",
             "users",
+            'sip_photo'
         )
