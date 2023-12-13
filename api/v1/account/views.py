@@ -482,8 +482,14 @@ class ChangeUserSipDetails(APIView):
         )
 
     def get(self, request, pk=None, format=None):
-        data = UserSipDetails.objects.get(pk=pk)
-        serializer = UserSipDetailsSerializer(data)
-        return Response(
-            {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-        )
+        try:
+            data = UserSipDetails.objects.get(pk=pk)
+            serializer = UserSipDetailsSerializer(data)
+            return Response(
+                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+            )
+        except UserSipDetails.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )

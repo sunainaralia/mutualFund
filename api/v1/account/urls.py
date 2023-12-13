@@ -40,5 +40,5 @@ urlpatterns = [
     path("changeadhar/<pk>/", ChangeUserAdharDetails.as_view()),
     path("sippost/", PostUserSipDetail.as_view()),
     path("sipall/", GetAllUserSipDetail.as_view()),
-    path("changesip/", ChangeUserSipDetails.as_view()),
+    path("changesip/<pk>/", ChangeUserSipDetails.as_view()),
 ]
