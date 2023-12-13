@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 import json
+import random
 from .models import (
     User,
     UserBasicDetail,
@@ -426,10 +427,11 @@ class PostUserSipDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-
         serializer = UserSipDetailsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        user.portfolio_no = random.randrange(100000000, 1000000000)
+        user.save()
         return Response(
             {
                 "success": True,

@@ -116,10 +116,15 @@ class ChangeSip(APIView):
             status=status.HTTP_200_OK,
         )
 
-    
     def get(self, request, pk=None, format=None):
-        data = SIP.objects.get(pk=pk)
-        serializer = SIPSerializer(data)
-        return Response(
-            {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-        )
+        try:
+            data = SIP.objects.get(pk=pk)
+            serializer = SIPSerializer(data)
+            return Response(
+                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+            )
+        except SIP.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND ,
+            )

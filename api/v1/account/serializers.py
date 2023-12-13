@@ -189,4 +189,5 @@ class UserSipDetailsSerializer(serializers.ModelSerializer):
             "member_status",
             "gain_value",
             "user",
+            "portfolio_no",
         ]

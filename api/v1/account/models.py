@@ -119,3 +119,4 @@ class UserSipDetails(models.Model):
     invested_amount = models.FloatField(default=0.0)
     member_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0, null=True)
+    portfolio_no = models.IntegerField(blank=True, null=True)
