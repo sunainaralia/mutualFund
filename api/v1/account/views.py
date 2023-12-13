@@ -460,26 +460,38 @@ class ChangeUserSipDetails(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk, format=None):
-        data = UserSipDetails.objects.get(pk=pk)
-        serializer = UserSipDetailsSerializer(data, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+        try:
+            data = UserSipDetails.objects.get(pk=pk)
+            serializer = UserSipDetailsSerializer(data, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(
+                    {
+                        "success": True,
+                        "data": serializer.data,
+                        "msg": "user sip info is changed successfully",
+                    },
+                    status=status.HTTP_200_OK,
+                )
+        except UserSipDetails.DoesNotExist:
             return Response(
-                {
-                    "success": True,
-                    "data": serializer.data,
-                    "msg": "user sip info is changed successfully",
-                },
-                status=status.HTTP_200_OK,
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
     def delete(self, request, pk, format=None):
-        data = UserSipDetails.objects.get(pk=pk)
-        data.delete()
-        return Response(
-            {"success": True, "msg": "user sip info is deleted succcessfully"},
-            status=status.HTTP_200_OK,
-        )
+        try:
+            data = UserSipDetails.objects.get(pk=pk)
+            data.delete()
+            return Response(
+                {"success": True, "msg": "user sip info is deleted succcessfully"},
+                status=status.HTTP_200_OK,
+            )
+        except UserSipDetails.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
     def get(self, request, pk=None, format=None):
         try:

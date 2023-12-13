@@ -95,26 +95,38 @@ class ChangeSip(APIView):
     renderer_classes = [UserRenderers]
 
     def patch(self, request, pk, format=None):
-        data = SIP.objects.get(pk=pk)
-        serializer = SIPSerializer(data, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+        try:
+            data = SIP.objects.get(pk=pk)
+            serializer = SIPSerializer(data, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(
+                    {
+                        "success": True,
+                        "data": serializer.data,
+                        "msg": " sip is changed successfully",
+                    },
+                    status=status.HTTP_200_OK,
+                )
+        except SIP.DoesNotExist:
             return Response(
-                {
-                    "success": True,
-                    "data": serializer.data,
-                    "msg": " sip is changed successfully",
-                },
-                status=status.HTTP_200_OK,
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
     def delete(self, request, pk, format=None):
-        data = SIP.objects.get(pk=pk)
-        data.delete()
-        return Response(
-            {"success": True, "msg": " sip is deleted succcessfully"},
-            status=status.HTTP_200_OK,
-        )
+        try:
+            data = SIP.objects.get(pk=pk)
+            data.delete()
+            return Response(
+                {"success": True, "msg": " sip is deleted succcessfully"},
+                status=status.HTTP_200_OK,
+            )
+        except SIP.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
     def get(self, request, pk=None, format=None):
         try:
@@ -126,5 +138,5 @@ class ChangeSip(APIView):
         except SIP.DoesNotExist:
             return Response(
                 {"success": False, "msg": " user doesn't exist"},
-                status=status.HTTP_404_NOT_FOUND ,
+                status=status.HTTP_404_NOT_FOUND,
             )
