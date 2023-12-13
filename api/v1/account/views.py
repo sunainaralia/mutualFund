@@ -427,19 +427,37 @@ class PostUserSipDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        serializer = UserSipDetailsSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        user.portfolio_no = random.randrange(100000000, 1000000000)
-        user.save()
-        return Response(
-            {
-                "success": True,
-                "msg": "user sip info is saved successfully",
-                "data": serializer.data,
-            },
-            status=status.HTTP_201_CREATED,
-        )
+        user_data = request.data.get("user")
+        check_id = UserSipDetails.objects.filter(user=user_data)
+        if check_id.exists():
+            existing_user = check_id.first()
+            serializer = UserSipDetailsSerializer(
+                existing_user, data=request.data, partial=True
+            )
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(
+                    {
+                        "success": True,
+                        "data": serializer.data,
+                        "msg": "user sip info is changed successfully",
+                    },
+                    status=status.HTTP_200_OK,
+                )
+        else:
+            serializer = UserSipDetailsSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            user.portfolio_no = random.randrange(100000000, 1000000000)
+            user.save()
+            return Response(
+                {
+                    "success": True,
+                    "msg": "user sip info is saved successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
 
 
 # get all user sip details
