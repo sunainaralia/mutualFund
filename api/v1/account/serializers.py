@@ -13,6 +13,8 @@ from rest_framework.authentication import authenticate
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from .utils import Util
 
+from api.v1.mutual_sip.models import SIP
+
 
 # serializer for user registration
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -179,7 +181,44 @@ class UserAdharVerification(serializers.ModelSerializer):
 
 
 # serializer for sip details
+# class UserSipDetailsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserSipDetails
+#         fields = [
+#             "id",
+#             "sips",
+#             "invested_amount",
+#             "member_status",
+#             "gain_value",
+#             "user",
+#             "portfolio_no",
+#         ]
+
+
+
+class SipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SIP
+        fields = [
+            "id",
+            "name",
+            "current_annual_return_rate",
+            "min_amount",
+            "current_value",
+            "time_period",
+            "created_at",
+            "no_of_investors",
+            "total_investment",
+            "investment_type",
+            "sip_status",
+            "gain_value",
+            "sip_photo",
+        ]
+
+
 class UserSipDetailsSerializer(serializers.ModelSerializer):
+    sips = SipSerializer(many=True, read_only=True)
+
     class Meta:
         model = UserSipDetails
         fields = [

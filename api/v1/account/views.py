@@ -9,6 +9,7 @@ from .models import (
     PanVerification,
     AdharCardVerify,
     UserSipDetails,
+    SIP,
 )
 from .serializers import (
     UserRegistrationSerializer,
@@ -21,6 +22,7 @@ from .serializers import (
     UserPanVerification,
     UserAdharVerification,
     UserSipDetailsSerializer,
+    SipSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -438,17 +440,34 @@ class PostUserSipDetail(APIView):
 
     def post(self, request, format=None):
         user_data = request.data.get("user")
-
+        new_sip_id = request.data.get("sips")
         check_id = UserSipDetails.objects.filter(user=user_data)
         if check_id.exists():
             existing_user = check_id.first()
-            existing_sips = existing_user.sips.all()
-            print(existing_sips)
-            if "sips" in request.data:
-                new_sips = request.data.get("sips", [])
-                existing_user.sips.add(*new_sips)
+            get_all_detail = SIP.objects.filter(users=existing_user.id)
+            new_sip = SIP.objects.get(id=new_sip_id[0])
+            serialized_existing_sips = SipSerializer(get_all_detail, many=True).data
+            serializer_new_sips = SipSerializer(new_sip).data
+            my_new_sip_list = []
+            my_new_sip_list.append(serializer_new_sips)
+
+            print(serialized_existing_sips)
+            print(serializer_new_sips)
+
+            # Manually create a dictionary for serialized_data
+            serialized_data = {
+                "id": existing_user.id,
+                "sips": serialized_existing_sips + my_new_sip_list,
+                "invested_amount": existing_user.invested_amount,
+                "member_status": existing_user.member_status,
+                "gain_value": existing_user.gain_value,
+                "user": existing_user.user.id,
+                "portfolio_no": existing_user.portfolio_no,
+            }
+
             serializer = UserSipDetailsSerializer(
-                existing_user, data=request.data, partial=True
+                instance=existing_user,
+                data=request.data,
             )
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -456,7 +475,7 @@ class PostUserSipDetail(APIView):
                 return Response(
                     {
                         "success": True,
-                        "data": serializer.data,
+                        "data": serialized_data,
                         "msg": "user sip info is changed successfully",
                     },
                     status=status.HTTP_200_OK,
@@ -469,8 +488,6 @@ class PostUserSipDetail(APIView):
                 if "sips" in request.data:
                     new_sips = request.data.get("sips", [])
                     user.sips.add(*new_sips)
-                    existing_user.sips.set(existing_sips)
-
                 user.portfolio_no = random.randrange(100000000, 1000000000)
                 user.save()
 

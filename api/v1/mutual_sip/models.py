@@ -1,5 +1,7 @@
 from django.db import models
 
+# from api.v1.account.models import UserSipDetails
+
 
 class SIP(models.Model):
     users = models.ManyToManyField(
