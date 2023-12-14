@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "api.v1.account",
     "api.v1.mutual_sip",
+    "api.v1.payment",
 ]
 
 MIDDLEWARE = [
@@ -134,7 +135,7 @@ REST_FRAMEWORK = {
     ),
 }
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,

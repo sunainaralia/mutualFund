@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 import random
+from django.contrib.auth import get_user_model
 from .models import (
     User,
     UserBasicDetail,
@@ -64,7 +65,7 @@ class UserLogin(APIView):
         user = authenticate(email=email, password=password)
         if user.is_blocked == False:
             if user is not None:
-                details = User.objects.get(email=email)
+                details = get_user_model().objects.get(email=email)
                 user_detail = {
                     "username": details.username,
                     "email": details.email,
@@ -422,20 +423,36 @@ class ChangeUserAdharDetails(APIView):
 
 
 #  post user sipdetails
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from .models import UserSipDetails
+from .serializers import UserSipDetailsSerializer
+from django.contrib.auth.models import User
+import random
+
+
 class PostUserSipDetail(APIView):
     renderer_classes = [UserRenderers]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
         user_data = request.data.get("user")
+
         check_id = UserSipDetails.objects.filter(user=user_data)
         if check_id.exists():
             existing_user = check_id.first()
+            existing_sips = existing_user.sips.all()
+            print(existing_sips)
+            if "sips" in request.data:
+                new_sips = request.data.get("sips", [])
+                existing_user.sips.add(*new_sips)
             serializer = UserSipDetailsSerializer(
                 existing_user, data=request.data, partial=True
             )
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+
                 return Response(
                     {
                         "success": True,
@@ -446,18 +463,25 @@ class PostUserSipDetail(APIView):
                 )
         else:
             serializer = UserSipDetailsSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            user = serializer.save()
-            user.portfolio_no = random.randrange(100000000, 1000000000)
-            user.save()
-            return Response(
-                {
-                    "success": True,
-                    "msg": "user sip info is saved successfully",
-                    "data": serializer.data,
-                },
-                status=status.HTTP_201_CREATED,
-            )
+
+            if serializer.is_valid(raise_exception=True):
+                user = serializer.save()
+                if "sips" in request.data:
+                    new_sips = request.data.get("sips", [])
+                    user.sips.add(*new_sips)
+                    existing_user.sips.set(existing_sips)
+
+                user.portfolio_no = random.randrange(100000000, 1000000000)
+                user.save()
+
+                return Response(
+                    {
+                        "success": True,
+                        "msg": "user sip info is saved successfully",
+                        "data": serializer.data,
+                    },
+                    status=status.HTTP_201_CREATED,
+                )
 
 
 # get all user sip details
@@ -498,18 +522,12 @@ class ChangeUserSipDetails(APIView):
             )
 
     def delete(self, request, pk, format=None):
-        try:
-            data = UserSipDetails.objects.get(pk=pk)
-            data.delete()
-            return Response(
-                {"success": True, "msg": "user sip info is deleted succcessfully"},
-                status=status.HTTP_200_OK,
-            )
-        except UserSipDetails.DoesNotExist:
-            return Response(
-                {"success": False, "msg": " user doesn't exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        data = UserSipDetails.objects.get(pk=pk)
+        data.delete()
+        return Response(
+            {"success": True, "msg": "user sip info is deleted succcessfully"},
+            status=status.HTTP_200_OK,
+        )
 
     def get(self, request, pk=None, format=None):
         try:
