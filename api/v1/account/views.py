@@ -440,7 +440,7 @@ class PostUserSipDetail(APIView):
             user_purchase_order.sips = new_sips.first()
             user_purchase_order.save()
         user_purchase_order.portfolio_no = random.randrange(100000000, 1000000000)
-        user_purchase_order.current_amount = new_sips.first().current_value
+        user_purchase_order.sip_price = new_sips.first().current_value
         user_purchase_order.save()
         return Response(
             {

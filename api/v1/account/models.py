@@ -119,5 +119,5 @@ class UserPurchaseOrderDetails(models.Model):
     portfolio_no = models.IntegerField(blank=True, null=True)
     date_of_purchase = models.DateTimeField(auto_now_add=True)
     investment_type = models.CharField(max_length=100)
-    current_amount = models.CharField(max_length=500, blank=True, null=True)
+    sip_price = models.CharField(max_length=500, blank=True, null=True)
 

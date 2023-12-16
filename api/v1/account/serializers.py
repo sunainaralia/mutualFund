@@ -211,5 +211,5 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "member_status",
             "user",
             "portfolio_no",
-            "current_amount",
+            "sip_price",
         ]

@@ -94,7 +94,7 @@ class UserSipOrderAdmin(admin.ModelAdmin):
         "user",
         "portfolio_no",
         "sips",
-        "current_amount",
+        "sip_price",
     ]
 
 
