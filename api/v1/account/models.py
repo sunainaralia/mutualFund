@@ -121,13 +121,3 @@ class UserPurchaseOrderDetails(models.Model):
     investment_type = models.CharField(max_length=100)
     current_amount = models.CharField(max_length=500, blank=True, null=True)
 
-
-# sip details
-class UserSipDetails(models.Model):
-    order_id = models.ForeignKey(
-        UserPurchaseOrderDetails,
-        related_name="order_details",
-        blank=True,
-        on_delete=models.CASCADE,
-        null=True,
-    )

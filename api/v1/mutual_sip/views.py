@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import authenticate
 from .renderers import UserRenderers
 from rest_framework.permissions import IsAuthenticated
-from api.v1.account.models import UserSipDetails
+from api.v1.account.models import UserPurchaseOrderDetails
 
 
 class PostSip(APIView):
@@ -19,7 +19,7 @@ class PostSip(APIView):
         serializer = SIPSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        users_in_sip = UserSipDetails.objects.filter(sips_taken=user)
+        users_in_sip = UserPurchaseOrderDetails.objects.filter(sips_taken=user)
         user.no_of_investors = users_in_sip.count()
         user.total_investment = sum(
             user_sip.invested_amount for user_sip in users_in_sip

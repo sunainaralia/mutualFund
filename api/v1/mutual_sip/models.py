@@ -5,7 +5,7 @@ from django.db import models
 
 class SIP(models.Model):
     users = models.ManyToManyField(
-        "account.UserSipDetails",
+        "account.UserPurchaseOrderDetails",
         related_name="sips_taken",
         blank=True,
     )

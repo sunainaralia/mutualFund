@@ -6,7 +6,6 @@ from .models import (
     PanVerification,
     AdharCardVerify,
     UserPurchaseOrderDetails,
-    UserSipDetails,
 )
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -181,20 +180,6 @@ class UserAdharVerification(serializers.ModelSerializer):
         fields = ["id", "adhar_card_front", "adhar_no", "adhar_card_back"]
 
 
-# serializer for sip details
-# class UserSipDetailsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = UserSipDetails
-#         fields = [
-#             "id",
-#             "sips",
-#             "invested_amount",
-#             "member_status",
-#             "gain_value",
-#             "user",
-#             "portfolio_no",
-#         ]
-
 
 class SipSerializer(serializers.ModelSerializer):
     class Meta:
@@ -228,9 +213,3 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "portfolio_no",
             "current_amount",
         ]
-
-
-class UserSipDetailsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserSipDetails
-        fields = ["id", "order_id"]

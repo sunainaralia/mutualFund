@@ -8,7 +8,6 @@ from .models import (
     UserBasicDetail,
     PanVerification,
     AdharCardVerify,
-    UserSipDetails,
     SIP,
     UserPurchaseOrderDetails,
 )
@@ -22,7 +21,6 @@ from .serializers import (
     UserBasicDetailSerializer,
     UserPanVerification,
     UserAdharVerification,
-    UserSipDetailsSerializer,
     SipSerializer,
     UserPurchaseOrderSerializer,
 )
@@ -540,67 +538,67 @@ class GetSipThroughId(APIView):
             )
 
 
-#  post user sip details
-class PostUserSip(APIView):
-    renderer_classes = [UserRenderers]
-    permission_classes = [IsAuthenticated]
+# #  post user sip details
+# class PostUserSip(APIView):
+#     renderer_classes = [UserRenderers]
+#     permission_classes = [IsAuthenticated]
 
-    def post(self, request, format=None):
-        serializer = UserSipDetailsSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            {
-                "success": True,
-                "msg": "user sip info is saved successfully",
-                "data": serializer.data,
-            },
-            status=status.HTTP_201_CREATED,
-        )
-
-
-# get all users sip details
-class GetAllUserSip(APIView):
-    renderer_classes = [UserRenderers]
-
-    def get(self, request, format=None):
-        data = UserSipDetails.objects.all()
-        serializer = UserSipDetailsSerializer(data, many=True)
-        return Response(
-            {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-        )
+#     def post(self, request, format=None):
+#         serializer = UserSipDetailsSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(
+#             {
+#                 "success": True,
+#                 "msg": "user sip info is saved successfully",
+#                 "data": serializer.data,
+#             },
+#             status=status.HTTP_201_CREATED,
+#         )
 
 
-# change user's sip details
-class ChangeUserSip(APIView):
-    renderer_classes = [UserRenderers]
-    permission_classes = [IsAuthenticated]
+# # get all users sip details
+# class GetAllUserSip(APIView):
+#     renderer_classes = [UserRenderers]
 
-    def patch(self, request, pk, format=None):
-        data = UserSipDetails.objects.get(pk=pk)
-        serializer = UserSipDetailsSerializer(data, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(
-                {
-                    "success": True,
-                    "data": serializer.data,
-                    "msg": "user sip info is changed successfully",
-                },
-                status=status.HTTP_200_OK,
-            )
+#     def get(self, request, format=None):
+#         data = UserSipDetails.objects.all()
+#         serializer = UserSipDetailsSerializer(data, many=True)
+#         return Response(
+#             {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+#         )
 
-    def delete(self, request, pk, format=None):
-        data = UserSipDetails.objects.get(pk=pk)
-        data.delete()
-        return Response(
-            {"success": True, "msg": "user sip info is deleted succcessfully"},
-            status=status.HTTP_200_OK,
-        )
 
-    def get(self, request, pk=None, format=None):
-        data = UserSipDetails.objects.get(pk=pk)
-        serializer = UserSipDetailsSerializer(data)
-        return Response(
-            {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-        )
+# # change user's sip details
+# class ChangeUserSip(APIView):
+#     renderer_classes = [UserRenderers]
+#     permission_classes = [IsAuthenticated]
+
+#     def patch(self, request, pk, format=None):
+#         data = UserSipDetails.objects.get(pk=pk)
+#         serializer = UserSipDetailsSerializer(data, data=request.data, partial=True)
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#             return Response(
+#                 {
+#                     "success": True,
+#                     "data": serializer.data,
+#                     "msg": "user sip info is changed successfully",
+#                 },
+#                 status=status.HTTP_200_OK,
+#             )
+
+#     def delete(self, request, pk, format=None):
+#         data = UserSipDetails.objects.get(pk=pk)
+#         data.delete()
+#         return Response(
+#             {"success": True, "msg": "user sip info is deleted succcessfully"},
+#             status=status.HTTP_200_OK,
+#         )
+
+#     def get(self, request, pk=None, format=None):
+#         data = UserSipDetails.objects.get(pk=pk)
+#         serializer = UserSipDetailsSerializer(data)
+#         return Response(
+#             {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+#         )

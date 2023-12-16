@@ -4,7 +4,6 @@ from .models import (
     UserBasicDetail,
     PanVerification,
     AdharCardVerify,
-    UserSipDetails,
     UserPurchaseOrderDetails,
 )
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -102,9 +101,3 @@ class UserSipOrderAdmin(admin.ModelAdmin):
 admin.site.register(UserPurchaseOrderDetails, UserSipOrderAdmin)
 
 
-# user sip details
-class UserSipDetailsAdmin(admin.ModelAdmin):
-    list_display = ["id", "order_id"]
-
-
-admin.site.register(UserSipDetails, UserSipDetailsAdmin)
