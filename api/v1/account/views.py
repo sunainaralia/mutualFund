@@ -524,9 +524,12 @@ class GetSipThroughId(APIView):
 
     def get(self, request, pk=None, format=None):
         try:
-            data = UserPurchaseOrderDetails.objects.get(user=pk)
-            print(data)
-            serializer = UserPurchaseOrderSerializer(data)
+            queryset = UserPurchaseOrderDetails.objects.filter(user=pk)
+            instances = queryset.all()
+            serializer = UserPurchaseOrderSerializer(
+                instances, many=True
+            )  # Fetch related user objects
+
             return Response(
                 {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
             )
