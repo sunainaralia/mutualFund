@@ -5,6 +5,7 @@ from .models import (
     UserBasicDetail,
     PanVerification,
     AdharCardVerify,
+    UserPurchaseOrderDetails,
     UserSipDetails,
 )
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
@@ -195,7 +196,6 @@ class UserAdharVerification(serializers.ModelSerializer):
 #         ]
 
 
-
 class SipSerializer(serializers.ModelSerializer):
     class Meta:
         model = SIP
@@ -216,17 +216,21 @@ class SipSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserSipDetailsSerializer(serializers.ModelSerializer):
-    sips = SipSerializer(many=True, read_only=True)
-
+class UserPurchaseOrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserSipDetails
+        model = UserPurchaseOrderDetails
         fields = [
             "id",
             "sips",
             "invested_amount",
             "member_status",
-            "gain_value",
             "user",
             "portfolio_no",
+            "current_amount",
         ]
+
+
+class UserSipDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserSipDetails
+        fields = ["id", "order_id"]

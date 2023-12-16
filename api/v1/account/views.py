@@ -10,6 +10,7 @@ from .models import (
     AdharCardVerify,
     UserSipDetails,
     SIP,
+    UserPurchaseOrderDetails,
 )
 from .serializers import (
     UserRegistrationSerializer,
@@ -23,6 +24,7 @@ from .serializers import (
     UserAdharVerification,
     UserSipDetailsSerializer,
     SipSerializer,
+    UserPurchaseOrderSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -215,8 +217,6 @@ class ChangeUserProfile(APIView):
             return Response(
                 {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
             )
-            # else:
-            #      return Response({"success": False, "data": serializer.data}, status=status.HTTP_200_OK)
         else:
             data = request.user
             serializer = UserProfileSerializer(data)
@@ -363,7 +363,6 @@ class PostUserAdharDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        user = request.user
         serializer = UserAdharVerification(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=self.request.user)
@@ -424,14 +423,7 @@ class ChangeUserAdharDetails(APIView):
         )
 
 
-#  post user sipdetails
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.views import APIView
-from .models import UserSipDetails
-from .serializers import UserSipDetailsSerializer
-from django.contrib.auth.models import User
-import random
+#  post user sip's order details
 
 
 class PostUserSipDetail(APIView):
@@ -439,70 +431,133 @@ class PostUserSipDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        user_data = request.data.get("user")
         new_sip_id = request.data.get("sips")
-        check_id = UserSipDetails.objects.filter(user=user_data)
-        if check_id.exists():
-            existing_user = check_id.first()
-            get_all_detail = SIP.objects.filter(users=existing_user.id)
-            new_sip = SIP.objects.get(id=new_sip_id[0])
-            serialized_existing_sips = SipSerializer(get_all_detail, many=True).data
-            serializer_new_sips = SipSerializer(new_sip).data
-            my_new_sip_list = []
-            my_new_sip_list.append(serializer_new_sips)
+        new_sip_ids = []
+        new_sip_ids.append(new_sip_id)
+        new_sips = SIP.objects.filter(id__in=new_sip_ids)
+        serializer = UserPurchaseOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_purchase_order = serializer.save(user=self.request.user)
+        if new_sips.exists():
+            user_purchase_order.sips = new_sips.first()
+            user_purchase_order.save()
+        user_purchase_order.portfolio_no = random.randrange(100000000, 1000000000)
+        user_purchase_order.current_amount = new_sips.first().current_value
+        user_purchase_order.save()
+        return Response(
+            {
+                "success": True,
+                "msg": "User SIP info is saved successfully",
+                "data": {
+                    "user_purchase_order": serializer.data,
+                },
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
-            print(serialized_existing_sips)
-            print(serializer_new_sips)
 
-            # Manually create a dictionary for serialized_data
-            serialized_data = {
-                "id": existing_user.id,
-                "sips": serialized_existing_sips + my_new_sip_list,
-                "invested_amount": existing_user.invested_amount,
-                "member_status": existing_user.member_status,
-                "gain_value": existing_user.gain_value,
-                "user": existing_user.user.id,
-                "portfolio_no": existing_user.portfolio_no,
-            }
+# get all user's sip order details
+class GetAllUserSipDetail(APIView):
+    renderer_classes = [UserRenderers]
 
-            serializer = UserSipDetailsSerializer(
-                instance=existing_user,
-                data=request.data,
+    def get(self, request, format=None):
+        data = UserPurchaseOrderDetails.objects.all()
+        serializer = UserPurchaseOrderSerializer(data, many=True)
+        return Response(
+            {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+        )
+
+
+# change user's order details
+class ChangeUserSipDetails(APIView):
+    renderer_classes = [UserRenderers]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk, format=None):
+        try:
+            data = UserPurchaseOrderDetails.objects.get(pk=pk)
+            serializer = UserPurchaseOrderSerializer(
+                data, data=request.data, partial=True
             )
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-
                 return Response(
                     {
                         "success": True,
-                        "data": serialized_data,
-                        "msg": "user sip info is changed successfully",
+                        "data": serializer.data,
+                        "msg": "user sip order info is changed successfully",
                     },
                     status=status.HTTP_200_OK,
                 )
-        else:
-            serializer = UserSipDetailsSerializer(data=request.data)
+        except UserPurchaseOrderDetails.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
-            if serializer.is_valid(raise_exception=True):
-                user = serializer.save()
-                if "sips" in request.data:
-                    new_sips = request.data.get("sips", [])
-                    user.sips.add(*new_sips)
-                user.portfolio_no = random.randrange(100000000, 1000000000)
-                user.save()
+    def delete(self, request, pk, format=None):
+        data = UserPurchaseOrderDetails.objects.get(pk=pk)
+        data.delete()
+        return Response(
+            {"success": True, "msg": "user sip order info is deleted succcessfully"},
+            status=status.HTTP_200_OK,
+        )
 
-                return Response(
-                    {
-                        "success": True,
-                        "msg": "user sip info is saved successfully",
-                        "data": serializer.data,
-                    },
-                    status=status.HTTP_201_CREATED,
-                )
+    def get(self, request, pk=None, format=None):
+        try:
+            data = UserPurchaseOrderDetails.objects.get(pk=pk)
+            print(data)
+            serializer = UserPurchaseOrderSerializer(data)
+            return Response(
+                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+            )
+        except UserPurchaseOrderDetails.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
 
-# get all user sip details
-class GetAllUserSipDetail(APIView):
+class GetSipThroughId(APIView):
+    renderer_classes = [UserRenderers]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None, format=None):
+        try:
+            data = UserPurchaseOrderDetails.objects.get(user=pk)
+            print(data)
+            serializer = UserPurchaseOrderSerializer(data)
+            return Response(
+                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+            )
+        except UserPurchaseOrderDetails.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+#  post user sip details
+class PostUserSip(APIView):
+    renderer_classes = [UserRenderers]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        serializer = UserSipDetailsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {
+                "success": True,
+                "msg": "user sip info is saved successfully",
+                "data": serializer.data,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+# get all users sip details
+class GetAllUserSip(APIView):
     renderer_classes = [UserRenderers]
 
     def get(self, request, format=None):
@@ -514,28 +569,22 @@ class GetAllUserSipDetail(APIView):
 
 
 # change user's sip details
-class ChangeUserSipDetails(APIView):
+class ChangeUserSip(APIView):
     renderer_classes = [UserRenderers]
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk, format=None):
-        try:
-            data = UserSipDetails.objects.get(pk=pk)
-            serializer = UserSipDetailsSerializer(data, data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(
-                    {
-                        "success": True,
-                        "data": serializer.data,
-                        "msg": "user sip info is changed successfully",
-                    },
-                    status=status.HTTP_200_OK,
-                )
-        except UserSipDetails.DoesNotExist:
+        data = UserSipDetails.objects.get(pk=pk)
+        serializer = UserSipDetailsSerializer(data, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
             return Response(
-                {"success": False, "msg": " user doesn't exist"},
-                status=status.HTTP_404_NOT_FOUND,
+                {
+                    "success": True,
+                    "data": serializer.data,
+                    "msg": "user sip info is changed successfully",
+                },
+                status=status.HTTP_200_OK,
             )
 
     def delete(self, request, pk, format=None):
@@ -547,14 +596,8 @@ class ChangeUserSipDetails(APIView):
         )
 
     def get(self, request, pk=None, format=None):
-        try:
-            data = UserSipDetails.objects.get(pk=pk)
-            serializer = UserSipDetailsSerializer(data)
-            return Response(
-                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-            )
-        except UserSipDetails.DoesNotExist:
-            return Response(
-                {"success": False, "msg": " user doesn't exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        data = UserSipDetails.objects.get(pk=pk)
+        serializer = UserSipDetailsSerializer(data)
+        return Response(
+            {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+        )

@@ -5,6 +5,7 @@ from .models import (
     PanVerification,
     AdharCardVerify,
     UserSipDetails,
+    UserPurchaseOrderDetails,
 )
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
@@ -85,16 +86,25 @@ class UserAdharDetailAdmin(admin.ModelAdmin):
 admin.site.register(AdharCardVerify, UserAdharDetailAdmin)
 
 
-# user sip details
-class UserSipAdmin(admin.ModelAdmin):
+# user sip order details
+class UserSipOrderAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "invested_amount",
         "member_status",
-        "gain_value",
         "user",
         "portfolio_no",
+        "sips",
+        "current_amount",
     ]
 
 
-admin.site.register(UserSipDetails, UserSipAdmin)
+admin.site.register(UserPurchaseOrderDetails, UserSipOrderAdmin)
+
+
+# user sip details
+class UserSipDetailsAdmin(admin.ModelAdmin):
+    list_display = ["id", "order_id"]
+
+
+admin.site.register(UserSipDetails, UserSipDetailsAdmin)

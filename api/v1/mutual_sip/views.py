@@ -12,45 +12,6 @@ from rest_framework.permissions import IsAuthenticated
 from api.v1.account.models import UserSipDetails
 
 
-#  post sip
-# class PostSip(APIView):
-#     renderer_classes = [UserRenderers]
-
-#     def post(self, request, format=None):
-#         serializer = SIPSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         user = serializer.save()
-#         return Response(
-#             {
-#                 "success": True,
-#                 "msg": " sip is saved successfully",
-#                 "data": serializer.data,
-#             },
-#             status=status.HTTP_201_CREATED,
-#         )
-
-
-# class PostSip(APIView):
-#     renderer_classes = [UserRenderers]
-
-#     def post(self, request, format=None):
-#         serializer = SIPSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         user = serializer.save()
-#         user_sip_details_count = UserSipDetails.objects.filter(sips_taken=user).count()
-#         user.no_of_investors = user_sip_details_count
-#         user.save()
-
-#         return Response(
-#             {
-#                 "success": True,
-#                 "msg": "SIP is saved successfully",
-#                 "data": serializer.data,
-#             },
-#             status=status.HTTP_201_CREATED,
-#         )
-
-
 class PostSip(APIView):
     renderer_classes = [UserRenderers]
 

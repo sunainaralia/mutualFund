@@ -108,15 +108,26 @@ class AdharCardVerify(models.Model):
     adhar_no = models.CharField(max_length=10)
 
 
-# sip details
-class UserSipDetails(models.Model):
+# purchase order of sip
+class UserPurchaseOrderDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    sips = models.ManyToManyField(
-        SIP,
-        related_name="sip_details",
-        blank=True,
+    sips = models.ForeignKey(
+        SIP, related_name="sip_details", blank=True, on_delete=models.CASCADE
     )
     invested_amount = models.FloatField(default=0.0)
     member_status = models.CharField(max_length=100, default="active")
-    gain_value = models.FloatField(default=0.0, null=True)
     portfolio_no = models.IntegerField(blank=True, null=True)
+    date_of_purchase = models.DateTimeField(auto_now_add=True)
+    investment_type = models.CharField(max_length=100)
+    current_amount = models.CharField(max_length=500, blank=True, null=True)
+
+
+# sip details
+class UserSipDetails(models.Model):
+    order_id = models.ForeignKey(
+        UserPurchaseOrderDetails,
+        related_name="order_details",
+        blank=True,
+        on_delete=models.CASCADE,
+        null=True,
+    )

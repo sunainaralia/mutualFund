@@ -19,7 +19,12 @@ from api.v1.account.views import (
     PostUserSipDetail,
     GetAllUserSipDetail,
     ChangeUserSipDetails,
+    GetSipThroughId,
+    PostUserSip,
+    GetAllUserSip,
+    ChangeUserSip,
 )
+
 urlpatterns = [
     path("registration/", UserRegistration.as_view()),
     path("login/", UserLogin.as_view()),
@@ -40,4 +45,10 @@ urlpatterns = [
     path("sippost/", PostUserSipDetail.as_view()),
     path("sipall/", GetAllUserSipDetail.as_view()),
     path("changesip/<pk>/", ChangeUserSipDetails.as_view()),
+    path("getsipuser/<pk>/", GetSipThroughId.as_view()),
+    path("postusersip/", PostUserSip.as_view()),
+    path("getallusersip/", GetAllUserSip.as_view()),
+    path("updateusersip/<pk>/", ChangeUserSip.as_view()),
+    path("deleteusersip/<pk>/", ChangeUserSip.as_view()),
+    path("getusersip/<pk>/", ChangeUserSip.as_view()),
 ]
