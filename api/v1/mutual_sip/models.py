@@ -8,7 +8,7 @@ class SIP(models.Model):
         "account.UserPurchaseOrderDetails",
         related_name="sips_taken",
         blank=True,
-        null=True,
+    
     )
     name = models.CharField(max_length=255)
     current_annual_return_rate = models.FloatField(default=0.0)
