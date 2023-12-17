@@ -19,7 +19,7 @@ class SIPAdmin(admin.ModelAdmin):
         "gain_value",
         "no_of_investors",
         "sip_photo",
-        
+        "annual_return_rate",
     ]
 
 

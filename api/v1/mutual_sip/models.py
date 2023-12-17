@@ -11,6 +11,7 @@ class SIP(models.Model):
     )
     name = models.CharField(max_length=255)
     current_annual_return_rate = models.FloatField(default=0.0)
+    annual_return_rate = models.FloatField(default=0.0)
     min_amount = models.FloatField(default=0.0)
     current_value = models.FloatField(default=0.0)
     time_period = models.IntegerField()
@@ -21,3 +22,32 @@ class SIP(models.Model):
     sip_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0)
     sip_photo = models.ImageField(upload_to="user_image", max_length=300, null=True)
+
+    def calculate_sip_values(self):
+        interest = self.current_annual_return_rate
+        installment = self.time_period
+        installment_amount = self.min_amount
+
+        rate = (interest / 100) / 12
+
+        current_value = (
+            installment_amount * (pow(1 + rate, installment) - 1) * (1 + rate) / rate
+        )
+        total_investment = installment_amount * installment
+        total_gain = current_value - total_investment
+        gain_percentage = (
+            (total_gain / total_investment) * 100 if total_investment != 0 else 0
+        )
+
+        return {
+            "current_value": current_value,
+            "total_gain": total_gain,
+            "gain_percentage": gain_percentage,
+        }
+
+    def save(self, *args, **kwargs):
+        calculated_values = self.calculate_sip_values()
+        self.current_value = calculated_values["current_value"]
+        self.gain_value = calculated_values["total_gain"]
+
+        super(SIP, self).save(*args, **kwargs)
