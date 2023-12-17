@@ -8,6 +8,7 @@ class SIP(models.Model):
         "account.UserPurchaseOrderDetails",
         related_name="sips_taken",
         blank=True,
+        null=True,
     )
     name = models.CharField(max_length=255)
     current_annual_return_rate = models.FloatField(default=0.0)
@@ -18,7 +19,7 @@ class SIP(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     no_of_investors = models.IntegerField(default=0, blank=True, null=True)
     total_investment = models.FloatField(default=0.0, blank=True, null=True)
-    investment_type = models.CharField(max_length=100)
+    investment_type = models.CharField(max_length=100, blank=True, null=True)
     sip_status = models.CharField(max_length=100, default="active")
     gain_value = models.FloatField(default=0.0)
     sip_photo = models.ImageField(upload_to="user_image", max_length=300, null=True)
