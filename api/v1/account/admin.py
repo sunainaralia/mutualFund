@@ -95,9 +95,11 @@ class UserSipOrderAdmin(admin.ModelAdmin):
         "portfolio_no",
         "sips",
         "sip_price",
+        "invested_period",
+        "installment_date",
+        "no_of_installment",
+        "sip_type",
     ]
 
 
 admin.site.register(UserPurchaseOrderDetails, UserSipOrderAdmin)
-
-

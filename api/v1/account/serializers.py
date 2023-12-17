@@ -180,7 +180,6 @@ class UserAdharVerification(serializers.ModelSerializer):
         fields = ["id", "adhar_card_front", "adhar_no", "adhar_card_back"]
 
 
-
 class SipSerializer(serializers.ModelSerializer):
     class Meta:
         model = SIP
@@ -212,4 +211,10 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "user",
             "portfolio_no",
             "sip_price",
+            "invested_period ",
+            "installment_date",
+            "no_of_installment",
+            "sip_type",
+            "investment_type",
+            "date_of_purchase",
         ]
