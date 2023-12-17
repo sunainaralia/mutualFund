@@ -19,6 +19,16 @@ class PostSip(APIView):
         serializer = SIPSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+
+        # Retrieve the SIP instance from the serializer
+        sip_instance = serializer.instance
+
+        # Update the SIP instance with calculated values and save it
+        calculated_values = sip_instance.calculate_sip_values()
+        sip_instance.current_value = calculated_values["current_value"]
+        sip_instance.gain_value = calculated_values["total_gain"]
+        sip_instance.save()
+
         users_in_sip = UserPurchaseOrderDetails.objects.filter(sips_taken=user)
         user.no_of_investors = users_in_sip.count()
         user.total_investment = sum(
