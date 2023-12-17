@@ -211,7 +211,7 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "user",
             "portfolio_no",
             "sip_price",
-            "invested_period ",
+            "invested_period",
             "installment_date",
             "no_of_installment",
             "sip_type",
