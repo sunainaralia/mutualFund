@@ -58,6 +58,7 @@ class UserBasicDetailAdmin(admin.ModelAdmin):
         "d_o_b",
         "address_details",
         "state",
+        "verification",
     ]
 
 

@@ -163,6 +163,7 @@ class UserBasicDetailSerializer(serializers.ModelSerializer):
             "zip_code",
             "state",
             "user",
+            "verification",
         ]
 
 

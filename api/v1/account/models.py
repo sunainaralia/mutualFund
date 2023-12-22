@@ -80,6 +80,7 @@ class UserBasicDetail(models.Model):
     address_details = models.TextField()
     zip_code = models.CharField(max_length=10)
     state = models.CharField(max_length=20)
+    verification = models.CharField(max_length=100, null=True, blank=True)
 
     REQUIRED_FIELDS = [
         "nationality",
@@ -90,6 +91,7 @@ class UserBasicDetail(models.Model):
         "zip_code",
         "state",
         "user",
+        "verification",
     ]
 
 
