@@ -58,6 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_blocked = models.BooleanField(default=False)
+    verification = models.CharField(max_length=100, null=True, blank=True)
     objects = UserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["password"]
@@ -91,7 +92,6 @@ class UserBasicDetail(models.Model):
         "zip_code",
         "state",
         "user",
-        "verification",
     ]
 
 
