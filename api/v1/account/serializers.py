@@ -174,7 +174,7 @@ class UserBasicDetailSerializer(serializers.ModelSerializer):
 class UserPanVerification(serializers.ModelSerializer):
     class Meta:
         model = PanVerification
-        fields = ["id", "pan_card", "pan_no"]
+        fields = ["id", "pan_card", "pan_no", "user"]
 
 
 # serializer for adhar verification
