@@ -1,4 +1,6 @@
 from django.db import models
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 # from api.v1.account.models import UserSipDetails
 
@@ -8,7 +10,6 @@ class SIP(models.Model):
         "account.UserPurchaseOrderDetails",
         related_name="sips_taken",
         blank=True,
-    
     )
     name = models.CharField(max_length=255)
     current_annual_return_rate = models.FloatField(default=0.0)
@@ -52,3 +53,39 @@ class SIP(models.Model):
         self.gain_value = calculated_values["total_gain"]
 
         super(SIP, self).save(*args, **kwargs)
+
+    def update_current_value(self):
+        calculated_values = self.calculate_sip_values()
+        self.current_value = calculated_values["current_value"]
+        self.gain_value = calculated_values["total_gain"]
+        self.save()
+
+    # Override the save method to trigger WebSocket update
+    # def save(self, *args, **kwargs):
+    #     is_new = not self.pk
+    #     super().save(*args, **kwargs)
+    #     if not is_new:
+    #         self.update_current_value()
+    #         self.notify_clients()
+
+    # async def notify_clients(self):
+    #     from channels.layers import get_channel_layer
+
+    #     channel_layer = get_channel_layer()
+    #     await channel_layer.group_send(
+    #         f"sip_{self.id}",
+    #         {
+    #             "type": "update_current_value",
+    #             "current_value": self.current_value,
+    #         },
+    #     )
+
+    # def notify_clients(self):
+    #     channel_layer = get_channel_layer()
+    #     async_to_sync(channel_layer.group_send)(
+    #         f"sip_{self.id}",
+    #         {
+    #             "type": "update_current_value",
+    #             "current_value": self.current_value,
+    #         },
+    #     )

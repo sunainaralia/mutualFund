@@ -21,6 +21,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "id",
             "email",
             "username",
             "password",
@@ -148,6 +149,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "phone_no",
             "referral_code",
             "profile_photo",
+            "verification",
         ]
 
 

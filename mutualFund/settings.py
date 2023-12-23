@@ -74,8 +74,8 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = "mutualFund.wsgi.application"
+ASGI_APPLICATION = "mutualFund.asgi.application"
+# WSGI_APPLICATION = "mutualFund.wsgi.application"
 
 
 # Database
