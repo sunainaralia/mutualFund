@@ -12,7 +12,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework.authentication import authenticate
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from .utils import Util
-
+from django.db import models
 from api.v1.mutual_sip.models import SIP
 
 
@@ -222,3 +222,37 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "investment_type",
             "date_of_purchase",
         ]
+
+
+# userallbasicdetails
+
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+    state = serializers.SerializerMethodField()
+    invested_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "profile_photo",
+            "username",
+            "email",
+            "created_at",
+            "state",
+            "is_blocked",
+            "invested_amount",
+        ]
+
+    def get_state(self, obj):
+        user_basic_detail = obj.userbasicdetail.first()
+        return user_basic_detail.state if user_basic_detail else None
+
+    def get_invested_amount(self, obj):
+        total_invested_amount = (
+            UserPurchaseOrderDetails.objects.filter(user=obj).aggregate(
+                models.Sum("invested_amount")
+            )["invested_amount__sum"]
+            or 0.0
+        )
+        return total_invested_amount

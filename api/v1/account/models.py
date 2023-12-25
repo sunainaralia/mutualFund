@@ -73,7 +73,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # basic details
 class UserBasicDetail(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="userbasicdetail"
+    )
 
     nationality = models.CharField(max_length=40)
     fullName = models.CharField(max_length=50)
@@ -112,7 +114,9 @@ class AdharCardVerify(models.Model):
 
 # purchase order of sip
 class UserPurchaseOrderDetails(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="userpurchaseorderdetails"
+    )
     sips = models.ForeignKey(
         SIP, related_name="sip_details", blank=True, on_delete=models.CASCADE
     )
@@ -120,7 +124,7 @@ class UserPurchaseOrderDetails(models.Model):
     member_status = models.CharField(max_length=100, default="active")
     portfolio_no = models.IntegerField(blank=True, null=True)
     date_of_purchase = models.DateTimeField(auto_now_add=True)
-    investment_type = models.CharField(max_length=100)
+    investment_type = models.CharField(max_length=100, default="active")
     sip_type = models.CharField(max_length=100, null=True, blank=True)
     sip_price = models.CharField(max_length=500, blank=True, null=True)
     invested_period = models.CharField(max_length=100, blank=True, null=True)

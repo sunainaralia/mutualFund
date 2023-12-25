@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 import json
+from rest_framework.generics import ListAPIView
 import random
 from django.contrib.auth import get_user_model
 from .models import (
@@ -23,6 +24,7 @@ from .serializers import (
     UserAdharVerification,
     SipSerializer,
     UserPurchaseOrderSerializer,
+    UserDetailsSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -543,67 +545,9 @@ class GetSipThroughId(APIView):
             )
 
 
-# #  post user sip details
-# class PostUserSip(APIView):
-#     renderer_classes = [UserRenderers]
-#     permission_classes = [IsAuthenticated]
+class UserDetailsAPIView(ListAPIView):
+    serializer_class = UserDetailsSerializer
 
-#     def post(self, request, format=None):
-#         serializer = UserSipDetailsSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(
-#             {
-#                 "success": True,
-#                 "msg": "user sip info is saved successfully",
-#                 "data": serializer.data,
-#             },
-#             status=status.HTTP_201_CREATED,
-#         )
-
-
-# # get all users sip details
-# class GetAllUserSip(APIView):
-#     renderer_classes = [UserRenderers]
-
-#     def get(self, request, format=None):
-#         data = UserSipDetails.objects.all()
-#         serializer = UserSipDetailsSerializer(data, many=True)
-#         return Response(
-#             {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-#         )
-
-
-# # change user's sip details
-# class ChangeUserSip(APIView):
-#     renderer_classes = [UserRenderers]
-#     permission_classes = [IsAuthenticated]
-
-#     def patch(self, request, pk, format=None):
-#         data = UserSipDetails.objects.get(pk=pk)
-#         serializer = UserSipDetailsSerializer(data, data=request.data, partial=True)
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save()
-#             return Response(
-#                 {
-#                     "success": True,
-#                     "data": serializer.data,
-#                     "msg": "user sip info is changed successfully",
-#                 },
-#                 status=status.HTTP_200_OK,
-#             )
-
-#     def delete(self, request, pk, format=None):
-#         data = UserSipDetails.objects.get(pk=pk)
-#         data.delete()
-#         return Response(
-#             {"success": True, "msg": "user sip info is deleted succcessfully"},
-#             status=status.HTTP_200_OK,
-#         )
-
-#     def get(self, request, pk=None, format=None):
-#         data = UserSipDetails.objects.get(pk=pk)
-#         serializer = UserSipDetailsSerializer(data)
-#         return Response(
-#             {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
-#         )
+    def get_queryset(self):
+        queryset = User.objects.filter(is_active=True)
+        return queryset

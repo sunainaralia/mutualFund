@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin):
                     "referral_code",
                     "profile_photo",
                     "is_blocked",
-                    "verification"
+                    "verification",
                 ]
             },
         ),

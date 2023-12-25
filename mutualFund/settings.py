@@ -164,6 +164,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 EMAIL_USE_TLS = True
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

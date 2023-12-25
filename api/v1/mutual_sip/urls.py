@@ -1,5 +1,5 @@
 # mutual_fund_app/urls.py
-from django.urls import path
+from django.urls import path,include
 from .views import PostSip, GetAllSip, ChangeSip
 
 urlpatterns = [
