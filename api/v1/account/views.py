@@ -22,7 +22,6 @@ from .serializers import (
     UserBasicDetailSerializer,
     UserPanVerification,
     UserAdharVerification,
-    SipSerializer,
     UserPurchaseOrderSerializer,
     UserDetailsSerializer,
     UserAllDetailsSerializer,
@@ -32,6 +31,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.authentication import authenticate
 from .renderers import UserRenderers
 from rest_framework.permissions import IsAuthenticated
+from api.v1.mutual_sip.models import SIP
 
 
 # jwt token
@@ -556,9 +556,12 @@ class UserDetailsAPIView(ListAPIView):
 
 
 class UserAllDetailsAPIView(APIView):
-    def get(self, request, user_id):
+    def get(self, request, pk):
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(id=pk)
+            order = UserPurchaseOrderDetails.objects.filter(user=user)
+            print(order)
+
         except User.DoesNotExist:
             return Response(
                 {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND

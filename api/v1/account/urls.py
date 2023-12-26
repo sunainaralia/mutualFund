@@ -47,7 +47,7 @@ urlpatterns = [
     path("getsipuser/<pk>/", GetSipThroughId.as_view()),
     path("UserDetailsAPI/", UserDetailsAPIView.as_view()),
     path(
-        "UserAllDetailsAPI/<int:user_id>/",
+        "UserAllDetailsAPI/<pk>/",
         UserAllDetailsAPIView.as_view(),
     ),
 ]
