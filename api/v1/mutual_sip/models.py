@@ -29,9 +29,7 @@ class SIP(models.Model):
         interest = self.current_annual_return_rate
         installment = self.time_period
         installment_amount = self.min_amount
-
         rate = (interest / 100) / 12
-
         current_value = (
             installment_amount * (pow(1 + rate, installment) - 1) * (1 + rate) / rate
         )
@@ -40,7 +38,6 @@ class SIP(models.Model):
         gain_percentage = (
             (total_gain / total_investment) * 100 if total_investment != 0 else 0
         )
-
         return {
             "current_value": current_value,
             "total_gain": total_gain,
@@ -59,33 +56,3 @@ class SIP(models.Model):
         self.current_value = calculated_values["current_value"]
         self.gain_value = calculated_values["total_gain"]
         self.save()
-
-    # Override the save method to trigger WebSocket update
-    # def save(self, *args, **kwargs):
-    #     is_new = not self.pk
-    #     super().save(*args, **kwargs)
-    #     if not is_new:
-    #         self.update_current_value()
-    #         self.notify_clients()
-
-    # async def notify_clients(self):
-    #     from channels.layers import get_channel_layer
-
-    #     channel_layer = get_channel_layer()
-    #     await channel_layer.group_send(
-    #         f"sip_{self.id}",
-    #         {
-    #             "type": "update_current_value",
-    #             "current_value": self.current_value,
-    #         },
-    #     )
-
-    # def notify_clients(self):
-    #     channel_layer = get_channel_layer()
-    #     async_to_sync(channel_layer.group_send)(
-    #         f"sip_{self.id}",
-    #         {
-    #             "type": "update_current_value",
-    #             "current_value": self.current_value,
-    #         },
-    #     )

@@ -25,6 +25,7 @@ from .serializers import (
     SipSerializer,
     UserPurchaseOrderSerializer,
     UserDetailsSerializer,
+    UserAllDetailsSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -546,8 +547,22 @@ class GetSipThroughId(APIView):
 
 
 class UserDetailsAPIView(ListAPIView):
+    renderer_classes = [UserRenderers]
     serializer_class = UserDetailsSerializer
 
     def get_queryset(self):
         queryset = User.objects.filter(is_active=True)
         return queryset
+
+
+class UserAllDetailsAPIView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = UserAllDetailsSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)

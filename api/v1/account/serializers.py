@@ -57,33 +57,6 @@ class UserChangePasswordSerializer(serializers.Serializer):
         fields = ["password1", "password2", "password"]
 
 
-# serializer for send password reset email
-# class SendResetPasswordEmailSerializer(serializers.Serializer):
-#     email = serializers.EmailField(max_length=255)
-
-#     class Meta:
-#         fields = ["email"]
-
-#     def validate(self, attrs):
-#         email = attrs.get("email")
-#         if User.objects.filter(email=email).exists():
-#             user = User.objects.get(email=email)
-#             uid = urlsafe_base64_encode(force_bytes(user.id))
-#             token = PasswordResetTokenGenerator().make_token(user)
-#             link = "http://localhost:3000/api/user/reset/" + uid + "/" + token
-#             body = "click following link to reset your password" + link
-#             print(body)
-#             data = {
-#                 "subject": "Reset your password",
-#                 "body": body,
-#                 "to_email": user.email,
-#             }
-#             Util.send_email(data)
-#             return attrs
-#         else:
-#             raise serializers.ValidationError("this email is not registered")
-
-
 class SendResetPasswordEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255)
 
@@ -247,6 +220,34 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     def get_state(self, obj):
         user_basic_detail = obj.userbasicdetail.first()
         return user_basic_detail.state if user_basic_detail else None
+
+    def get_invested_amount(self, obj):
+        total_invested_amount = (
+            UserPurchaseOrderDetails.objects.filter(user=obj).aggregate(
+                models.Sum("invested_amount")
+            )["invested_amount__sum"]
+            or 0.0
+        )
+        return total_invested_amount
+
+
+# serializers for comlete user details
+
+
+class UserAllDetailsSerializer(serializers.ModelSerializer):
+    invested_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "profile_photo",
+            "username",
+            "email",
+            "phone_no",
+            "verification",
+            "invested_amount",
+        ]
 
     def get_invested_amount(self, obj):
         total_invested_amount = (

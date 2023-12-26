@@ -21,6 +21,7 @@ from api.v1.account.views import (
     ChangeUserSipDetails,
     GetSipThroughId,
     UserDetailsAPIView,
+    UserAllDetailsAPIView,
 )
 
 urlpatterns = [
@@ -45,4 +46,8 @@ urlpatterns = [
     path("changesip/<pk>/", ChangeUserSipDetails.as_view()),
     path("getsipuser/<pk>/", GetSipThroughId.as_view()),
     path("UserDetailsAPI/", UserDetailsAPIView.as_view()),
+    path(
+        "UserAllDetailsAPI/<int:user_id>/",
+        UserAllDetailsAPIView.as_view(),
+    ),
 ]

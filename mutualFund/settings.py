@@ -198,6 +198,6 @@ CHANNEL_LAYERS = {
 CORS_ALLOWED_ORIGINS = [
     "https://example.com",
     "https://sub.example.com",
-    "http://localhost:*",
-    "http://127.0.0.1:*",
+    "http://localhost:3001",
+    "http://localhost:3000",
 ]
