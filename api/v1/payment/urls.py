@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import make_payment
+from .views import TransactionView, GetTransactionView, GetTransactionThroughUserId
 
 urlpatterns = [
-    path("make_payment/", make_payment, name="make_payment"),
+    path("transaction/", TransactionView.as_view()),
+    path("getTransaction/<pk>/", GetTransactionView.as_view()),
+    path("GetTransactionThroughUserId/<pk>/", GetTransactionThroughUserId.as_view()),
 ]

@@ -556,11 +556,12 @@ class UserDetailsAPIView(ListAPIView):
 
 
 class UserAllDetailsAPIView(APIView):
+    renderer_classes = [UserRenderers]
+
     def get(self, request, pk):
         try:
             user = User.objects.get(id=pk)
             order = UserPurchaseOrderDetails.objects.filter(user=user)
-            print(order)
 
         except User.DoesNotExist:
             return Response(
@@ -569,3 +570,55 @@ class UserAllDetailsAPIView(APIView):
 
         serializer = UserAllDetailsSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetUserSipPurchaseDetailthroughId(APIView):
+    renderer_classes = [UserRenderers]
+
+    def get(self, request, pk=None, format=None):
+        try:
+            queryset = UserPurchaseOrderDetails.objects.filter(user=pk)
+            user_personal_detail = User.objects.get(id=pk)
+            instances = queryset.all()
+            serializer = UserPurchaseOrderSerializer(instances, many=True)
+
+            sips_list = [item["sips"] for item in serializer.data]
+            sips = [SIP.objects.get(id=item) for item in sips_list]
+            total_invested_amount_of_user = [
+                item["invested_amount"] for item in serializer.data
+            ]
+            current_values = [sip.current_value for sip in sips]
+            gain_value = [sip.gain_value for sip in sips]
+            annual_return_rate = [sip.annual_return_rate for sip in sips]
+            for i, item in enumerate(serializer.data):
+                item["current_value"] = current_values[i]
+            for i, item in enumerate(serializer.data):
+                item["gain_value"] = gain_value[i]
+            for i, item in enumerate(serializer.data):
+                item["annual_return_rate"] = annual_return_rate[i]
+            total_current_value = sum(current_values)
+            total_invested_amount = sum(total_invested_amount_of_user)
+            profile_photo_url = (
+                user_personal_detail.profile_photo.url
+                if user_personal_detail.profile_photo
+                else None
+            )
+
+            return Response(
+                {
+                    "success": True,
+                    "data": serializer.data,
+                    "profile_photo": profile_photo_url,
+                    "username": user_personal_detail.username,
+                    "email": user_personal_detail.email,
+                    "kyc_status": user_personal_detail.verification,
+                    "total_current_value": total_current_value,
+                    "total_investment": total_invested_amount,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except UserPurchaseOrderDetails.DoesNotExist:
+            return Response(
+                {"success": False, "msg": " user doesn't exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
