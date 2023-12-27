@@ -589,6 +589,7 @@ class GetUserSipPurchaseDetailthroughId(APIView):
             ]
             current_values = [sip.current_value for sip in sips]
             gain_value = [sip.gain_value for sip in sips]
+            name = [sip.name for sip in sips]
             annual_return_rate = [sip.annual_return_rate for sip in sips]
             for i, item in enumerate(serializer.data):
                 item["current_value"] = current_values[i]
@@ -596,6 +597,8 @@ class GetUserSipPurchaseDetailthroughId(APIView):
                 item["gain_value"] = gain_value[i]
             for i, item in enumerate(serializer.data):
                 item["annual_return_rate"] = annual_return_rate[i]
+            for i, item in enumerate(serializer.data):
+                item["sip_name"] = name[i]
             total_current_value = sum(current_values)
             total_invested_amount = sum(total_invested_amount_of_user)
             profile_photo_url = (
