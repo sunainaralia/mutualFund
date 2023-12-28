@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from .renderers import UserRenderers
 from rest_framework.response import Response
 from rest_framework import status
+from .signals import payment_success_signal
 
 
 class TransactionView(APIView):
@@ -13,6 +14,7 @@ class TransactionView(APIView):
         serializer = TransactionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        payment_success_signal.send(sender=user.__class__, instance=user)
         return Response(
             {
                 "success": True,
@@ -43,9 +45,7 @@ class GetTransactionThroughUserId(APIView):
         try:
             queryset = Transactions.objects.filter(user=pk)
             instances = queryset.all()
-            serializer = TransactionSerializer(
-                instances, many=True
-            )  # Fetch related user objects
+            serializer = TransactionSerializer(instances, many=True)
 
             return Response(
                 {"success": True, "data": serializer.data}, status=status.HTTP_200_OK

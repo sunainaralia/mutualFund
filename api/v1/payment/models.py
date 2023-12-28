@@ -10,3 +10,7 @@ class Transactions(models.Model):
     title = models.CharField(max_length=100, blank=True, null=True)
     transaction_type = models.CharField(max_length=100, null=True, blank=True)
     amount = models.IntegerField(default=0.0, blank=True)
+
+
+
+    
