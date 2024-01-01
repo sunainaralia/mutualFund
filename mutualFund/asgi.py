@@ -1,17 +1,13 @@
-# asgi.py
 import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
-from api.v1.payment.routing import (
-    websocket_urlpatterns,
-)
+
+from api.v1.payment import routing
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mutualFund.settings")
-
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
-        "websocket": AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
+        "websocket": URLRouter(routing.websocket_urlpatterns),
     }
 )

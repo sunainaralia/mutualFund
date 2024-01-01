@@ -4,7 +4,7 @@ from .models import Transactions
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    notification_sent = serializers.BooleanField(default=False, read_only=True)
+    # notification_sent = serializers.BooleanField(default=False, read_only=True)
 
     class Meta:
         model = Transactions
@@ -16,5 +16,5 @@ class TransactionSerializer(serializers.ModelSerializer):
             "user",
             "transaction_type",
             "amount",
-            "notification_sent",
+            # "notification_sent",
         )

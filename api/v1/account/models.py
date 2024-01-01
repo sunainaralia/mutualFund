@@ -101,7 +101,7 @@ class UserBasicDetail(models.Model):
 class PanVerification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pan_card = models.ImageField(upload_to="user_image", max_length=300)
-    pan_no = models.CharField(max_length=10)
+    pan_no = models.CharField(max_length=12)
 
 
 # adhar card verification
@@ -109,7 +109,7 @@ class AdharCardVerify(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     adhar_card_front = models.ImageField(upload_to="user_image", max_length=300)
     adhar_card_back = models.ImageField(upload_to="user_image", max_length=300)
-    adhar_no = models.CharField(max_length=10)
+    adhar_no = models.CharField(max_length=12)
 
 
 # purchase order of sip
