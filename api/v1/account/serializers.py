@@ -149,12 +149,26 @@ class UserPanVerification(serializers.ModelSerializer):
         model = PanVerification
         fields = ["id", "pan_card", "pan_no", "user"]
 
+    def validate(self, attrs):
+        pan_no = attrs.get("pan_no")
+        if len(pan_no) == 10:
+            return attrs
+        else:
+            raise serializers.ValidationError("pan card no. must be 10 digit no")
+
 
 # serializer for adhar verification
 class UserAdharVerification(serializers.ModelSerializer):
     class Meta:
         model = AdharCardVerify
         fields = ["id", "adhar_card_front", "adhar_no", "adhar_card_back"]
+
+    def validate(self, attrs):
+        adhar_no = attrs.get("adhar_no")
+        if len(adhar_no) == 10:
+            return attrs
+        else:
+            raise serializers.ValidationError("adhar card no. must be 10 digit no")
 
 
 class SipSerializer(serializers.ModelSerializer):
