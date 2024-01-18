@@ -196,7 +196,7 @@ CHANNEL_LAYERS = {
 }
 CORS_ALLOWED_ORIGINS = [
     "https://example.com",
-    "https://sub.example.com",
+    "https://mutualfund.netlify.app",
     "http://localhost:3001",
     "http://localhost:3000",
 ]
