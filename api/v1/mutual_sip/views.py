@@ -24,7 +24,6 @@ class PostSip(APIView):
         user = serializer.save()
         sip_instance = serializer.instance
         calculated_values = sip_instance.calculate_sip_values()
-        sip_instance.current_value = calculated_values["current_value"]
         sip_instance.gain_value = calculated_values["total_gain"]
         sip_instance.save()
 
