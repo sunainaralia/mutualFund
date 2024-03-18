@@ -18,18 +18,19 @@ class SIP(models.Model):
     investment_type = models.CharField(max_length=100, blank=True, null=True)
     sip_status = models.CharField(max_length=100, default="active")
     sip_photo = models.ImageField(upload_to="user_image", max_length=300, null=True)
+    min_amount = models.IntegerField(blank=True,default=0.0,null=True)
+    description = models.CharField(max_length=1000,null=True)
 
 
 class SIP_DETAILS(models.Model):
-    sip = models.ForeignKey(
-        SIP, on_delete=models.CASCADE, related_name="sip"
-    )
+    sip = models.ForeignKey(SIP, on_delete=models.CASCADE, related_name="sip")
     no_of_investors = models.IntegerField(default=0, blank=True, null=True)
     total_investment = models.FloatField(default=0.0, blank=True, null=True)
     min_amount = models.FloatField(default=0.0)
     time_period = models.IntegerField()
     current_value = models.FloatField(default=0.0, blank=True)
     gain_value = models.FloatField(default=0.0, blank=True)
+
     def calculate_sip_values(self):
         current_value = self.current_value
         installment = self.time_period

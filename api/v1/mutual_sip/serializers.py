@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SIP,SIP_DETAILS
+from .models import SIP, SIP_DETAILS
 
 
 class SIPSerializer(serializers.ModelSerializer):
@@ -15,6 +15,8 @@ class SIPSerializer(serializers.ModelSerializer):
             "users",
             "sip_photo",
             "annual_return_rate",
+            "min_amount",
+            "description",
         )
 
     def create(self, validated_data):
