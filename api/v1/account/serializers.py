@@ -188,6 +188,7 @@ class SipSerializer(serializers.ModelSerializer):
             "sip_status",
             "gain_value",
             "sip_photo",
+           
         ]
 
 
@@ -208,6 +209,7 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "sip_type",
             "investment_type",
             "date_of_purchase",
+            "current_value",
         ]
 
 

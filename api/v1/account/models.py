@@ -8,6 +8,8 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 class UserManager(BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
@@ -113,9 +115,14 @@ class AdharCardVerify(models.Model):
 
 
 # purchase order of sip
+from django.db import models
+from api.v1.mutual_sip.models import SIP
+
 class UserPurchaseOrderDetails(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="userpurchaseorderdetails"
+        "account.User",
+        on_delete=models.CASCADE,
+        related_name="userpurchaseorderdetails",
     )
     sips = models.ForeignKey(
         SIP, related_name="sip_details", blank=True, on_delete=models.CASCADE
@@ -130,3 +137,9 @@ class UserPurchaseOrderDetails(models.Model):
     invested_period = models.CharField(max_length=100, blank=True, null=True)
     installment_date = models.IntegerField(blank=True, null=True)
     no_of_installment = models.IntegerField(blank=True, null=True)
+    current_value = models.FloatField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.current_value:
+            self.current_value = self.invested_amount
+        super().save(*args, **kwargs)

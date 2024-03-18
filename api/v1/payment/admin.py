@@ -11,7 +11,8 @@ class TransactionAdmin(admin.ModelAdmin):
         "invoice",
         "user",
         "transaction_type",
-        "amount"
+        "amount",
+        "transaction_id"
     ]
 
 

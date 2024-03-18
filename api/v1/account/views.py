@@ -1,6 +1,5 @@
 from rest_framework.response import Response
 from rest_framework import status
-import json
 from rest_framework.generics import ListAPIView
 import random
 from django.contrib.auth import get_user_model
@@ -31,7 +30,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.authentication import authenticate
 from .renderers import UserRenderers
 from rest_framework.permissions import IsAuthenticated
-from api.v1.mutual_sip.models import SIP
+from api.v1.mutual_sip.models import SIP, SIP_DETAILS
 
 
 # jwt token
@@ -430,6 +429,7 @@ class ChangeUserAdharDetails(APIView):
 
 
 #  post user sip's order details
+from api.v1.account.models import User  # Import the User model
 
 
 class PostUserSipDetail(APIView):
@@ -443,13 +443,44 @@ class PostUserSipDetail(APIView):
         new_sips = SIP.objects.filter(id__in=new_sip_ids)
         serializer = UserPurchaseOrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_purchase_order = serializer.save(user=self.request.user)
+
+        # Convert 'user' value to an integer
+        check_user_exists = int(request.data.get("user"))
+
+        # Retrieve the User instance corresponding to the user ID
+        user_instance = User.objects.get(pk=check_user_exists)
+
+        find_user = UserPurchaseOrderDetails.objects.filter(user=user_instance)
+
+        # Initialize user_purchase_order
+        user_purchase_order = None
+
+        if find_user:
+            old_portfolio = find_user.first().portfolio_no
+            user_purchase_order = serializer.save(
+                user=user_instance
+            )  # Assign user instance
+            user_purchase_order.portfolio_no = old_portfolio
+            print("old_portfolio")
+
         if new_sips.exists():
+            # Ensure user_purchase_order is initialized if not found previously
+            if not user_purchase_order:
+                user_purchase_order = serializer.save(user=user_instance)
             user_purchase_order.sips = new_sips.first()
             user_purchase_order.save()
-        user_purchase_order.portfolio_no = random.randrange(100000000, 1000000000)
-        user_purchase_order.sip_price = new_sips.first().current_value
-        user_purchase_order.save()
+            sip_details = SIP_DETAILS.objects.filter(sip=new_sips.first())
+            if sip_details.exists():
+                user_purchase_order.sip_price = sip_details.first().min_amount
+                user_purchase_order.save()
+
+        if not find_user:
+            # Ensure user_purchase_order is initialized if not found previously
+            if not user_purchase_order:
+                user_purchase_order = serializer.save(user=user_instance)
+            user_purchase_order.portfolio_no = random.randrange(100000000, 1000000000)
+            user_purchase_order.save()
+
         return Response(
             {
                 "success": True,
@@ -582,25 +613,37 @@ class GetUserSipPurchaseDetailthroughId(APIView):
             instances = queryset.all()
             serializer = UserPurchaseOrderSerializer(instances, many=True)
 
+            # Get the list of SIP IDs from the serializer data
             sips_list = [item["sips"] for item in serializer.data]
-            sips = [SIP.objects.get(id=item) for item in sips_list]
+
+            # Retrieve SIP_DETAILS objects for each SIP
+            sips_details = [SIP_DETAILS.objects.filter(sip=item) for item in sips_list]
+
+            # Calculate current_value and gain_value for each SIP_DETAILS
+            current_values = [
+                sip_detail.current_value
+                for sip_detail_list in sips_details
+                for sip_detail in sip_detail_list
+            ]
+            gain_values = [
+                sip_detail.gain_value
+                for sip_detail_list in sips_details
+                for sip_detail in sip_detail_list
+            ]
+
+            # Assign current_value and gain_value to each item in serializer data
+            for i, item in enumerate(serializer.data):
+                item["current_value"] = current_values[i]
+                item["gain_value"] = gain_values[i]
+
+            # Calculate total_current_value and total_invested_amount
+            total_current_value = sum(current_values)
             total_invested_amount_of_user = [
                 item["invested_amount"] for item in serializer.data
             ]
-            current_values = [sip.current_value for sip in sips]
-            gain_value = [sip.gain_value for sip in sips]
-            name = [sip.name for sip in sips]
-            annual_return_rate = [sip.annual_return_rate for sip in sips]
-            for i, item in enumerate(serializer.data):
-                item["current_value"] = current_values[i]
-            for i, item in enumerate(serializer.data):
-                item["gain_value"] = gain_value[i]
-            for i, item in enumerate(serializer.data):
-                item["annual_return_rate"] = annual_return_rate[i]
-            for i, item in enumerate(serializer.data):
-                item["sip_name"] = name[i]
-            total_current_value = sum(current_values)
             total_invested_amount = sum(total_invested_amount_of_user)
+
+            # Get user profile photo URL
             profile_photo_url = (
                 user_personal_detail.profile_photo.url
                 if user_personal_detail.profile_photo

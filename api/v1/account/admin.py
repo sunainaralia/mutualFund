@@ -101,6 +101,7 @@ class UserSipOrderAdmin(admin.ModelAdmin):
         "installment_date",
         "no_of_installment",
         "sip_type",
+        "current_value",
     ]
 
 

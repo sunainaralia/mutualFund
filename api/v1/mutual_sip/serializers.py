@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SIP
+from .models import SIP,SIP_DETAILS
 
 
 class SIPSerializer(serializers.ModelSerializer):
@@ -9,15 +9,9 @@ class SIPSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "current_annual_return_rate",
-            "min_amount",
-            "current_value",
-            "time_period",
             "created_at",
-            "total_investment",
             "investment_type",
             "sip_status",
-            "gain_value",
-            "no_of_investors",
             "users",
             "sip_photo",
             "annual_return_rate",
@@ -34,3 +28,18 @@ class SIPSerializer(serializers.ModelSerializer):
         # Create the SIP instance
         instance = super(SIPSerializer, self).create(validated_data)
         return instance
+
+
+class SIPDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SIP_DETAILS
+        fields = (
+            "id",
+            "min_amount",
+            "current_value",
+            "time_period",
+            "total_investment",
+            "no_of_investors",
+            "sip",
+            "gain_value",
+        )

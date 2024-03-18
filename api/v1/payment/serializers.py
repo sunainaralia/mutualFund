@@ -16,5 +16,6 @@ class TransactionSerializer(serializers.ModelSerializer):
             "user",
             "transaction_type",
             "amount",
+            "transaction_id"
             # "notification_sent",
         )
