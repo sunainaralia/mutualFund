@@ -6,6 +6,7 @@ from .models import (
     PanVerification,
     AdharCardVerify,
     UserPurchaseOrderDetails,
+    PreviousCurrentValueLog
 )
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -192,7 +193,16 @@ class SipSerializer(serializers.ModelSerializer):
         ]
 
 
+
+class PreviousCurrentValueLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PreviousCurrentValueLog
+        fields = ["current_value", "timestamp"]
+
+
 class UserPurchaseOrderSerializer(serializers.ModelSerializer):
+    logs = PreviousCurrentValueLogSerializer(many=True, read_only=True)
+
     class Meta:
         model = UserPurchaseOrderDetails
         fields = [
@@ -210,6 +220,7 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "investment_type",
             "date_of_purchase",
             "current_value",
+            "logs",
         ]
 
 

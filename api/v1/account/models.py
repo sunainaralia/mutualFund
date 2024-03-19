@@ -7,9 +7,8 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
 )
+from django.utils import timezone
 
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 
 class UserManager(BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
@@ -115,17 +114,18 @@ class AdharCardVerify(models.Model):
 
 
 # purchase order of sip
-from django.db import models
-from api.v1.mutual_sip.models import SIP
 
 class UserPurchaseOrderDetails(models.Model):
     user = models.ForeignKey(
         "account.User",
         on_delete=models.CASCADE,
-        related_name="userpurchaseorderdetails",
+        related_name="all_userpurchasedetails",
     )
     sips = models.ForeignKey(
-        SIP, related_name="sip_details", blank=True, on_delete=models.CASCADE
+        SIP,
+        related_name="user_purchase_order_details",
+        blank=True,
+        on_delete=models.CASCADE,
     )
     invested_amount = models.FloatField(default=0.0)
     member_status = models.CharField(max_length=100, default="active")
@@ -143,3 +143,21 @@ class UserPurchaseOrderDetails(models.Model):
         if not self.current_value:
             self.current_value = self.invested_amount
         super().save(*args, **kwargs)
+        # Log the change
+        if self.pk is not None:
+            PreviousCurrentValueLog.objects.create(
+                user_purchase_order=self,
+                current_value=self.current_value,
+                timestamp=timezone.now(),
+            )
+
+
+class PreviousCurrentValueLog(models.Model):
+    user_purchase_order = models.ForeignKey(
+        UserPurchaseOrderDetails, on_delete=models.CASCADE
+    )
+    current_value = models.FloatField()
+    timestamp = models.DateTimeField()
+
+    class Meta:
+        ordering = ["-timestamp"]

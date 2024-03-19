@@ -4,9 +4,6 @@ from .views import (
     PostSip,
     GetAllSip,
     ChangeSip,
-    PostSipDetails,
-    ChangeSipDetails,
-    GetAllSipDetails,
 )
 
 urlpatterns = [
@@ -17,11 +14,5 @@ urlpatterns = [
         name="sip-retrieve-update-destroy",
     ),
     path("allsip/", GetAllSip.as_view()),
-    path("sipdetails/", PostSipDetails.as_view(), name="sip-list-details-create"),
-    path(
-        "sipdetails/<int:pk>/",
-        ChangeSipDetails.as_view(),
-        name="sip-retrieve-details-update-destroy",
-    ),
-    path("allsipdetails/", GetAllSipDetails.as_view()),
+
 ]

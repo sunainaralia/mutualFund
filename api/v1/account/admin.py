@@ -5,6 +5,7 @@ from .models import (
     PanVerification,
     AdharCardVerify,
     UserPurchaseOrderDetails,
+    PreviousCurrentValueLog,
 )
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
@@ -106,3 +107,10 @@ class UserSipOrderAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserPurchaseOrderDetails, UserSipOrderAdmin)
+
+
+class PreviousCurrentValueAdmin(admin.ModelAdmin):
+    list_display = ["id", "user_purchase_order", "current_value", "timestamp"]
+
+
+admin.site.register(PreviousCurrentValueLog, PreviousCurrentValueAdmin)

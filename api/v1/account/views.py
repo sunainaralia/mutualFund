@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import ListAPIView
+from rest_framework.exceptions import NotFound
 import random
 from django.contrib.auth import get_user_model
 from .models import (
@@ -10,6 +11,7 @@ from .models import (
     AdharCardVerify,
     SIP,
     UserPurchaseOrderDetails,
+    PreviousCurrentValueLog
 )
 from .serializers import (
     UserRegistrationSerializer,
@@ -24,13 +26,14 @@ from .serializers import (
     UserPurchaseOrderSerializer,
     UserDetailsSerializer,
     UserAllDetailsSerializer,
+    PreviousCurrentValueLogSerializer
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.authentication import authenticate
 from .renderers import UserRenderers
 from rest_framework.permissions import IsAuthenticated
-from api.v1.mutual_sip.models import SIP, SIP_DETAILS
+from api.v1.mutual_sip.models import SIP
 
 
 # jwt token
@@ -65,7 +68,6 @@ class UserRegistration(APIView):
 # user login
 class UserLogin(APIView):
     renderer_classes = [UserRenderers]
-
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -429,7 +431,7 @@ class ChangeUserAdharDetails(APIView):
 
 
 #  post user sip's order details
-from api.v1.account.models import User  # Import the User model
+from api.v1.account.models import User
 
 
 class PostUserSipDetail(APIView):
@@ -461,18 +463,13 @@ class PostUserSipDetail(APIView):
                 user=user_instance
             )  # Assign user instance
             user_purchase_order.portfolio_no = old_portfolio
-            print("old_portfolio")
 
         if new_sips.exists():
             # Ensure user_purchase_order is initialized if not found previously
             if not user_purchase_order:
                 user_purchase_order = serializer.save(user=user_instance)
-            user_purchase_order.sips = new_sips.first()
+            user_purchase_order.sip_price = new_sips.first().min_amount
             user_purchase_order.save()
-            sip_details = SIP_DETAILS.objects.filter(sip=new_sips.first())
-            if sip_details.exists():
-                user_purchase_order.sip_price = sip_details.first().min_amount
-                user_purchase_order.save()
 
         if not find_user:
             # Ensure user_purchase_order is initialized if not found previously
@@ -528,7 +525,7 @@ class ChangeUserSipDetails(APIView):
                 )
         except UserPurchaseOrderDetails.DoesNotExist:
             return Response(
-                {"success": False, "msg": " user doesn't exist"},
+                {"success": False, "msg": " user sip doesn't exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -608,41 +605,16 @@ class GetUserSipPurchaseDetailthroughId(APIView):
 
     def get(self, request, pk=None, format=None):
         try:
+            users_in_sip = UserPurchaseOrderDetails.objects.filter(user=pk)
+            total_investment = sum(
+                user_sip.invested_amount for user_sip in users_in_sip
+            )
+            current_value = sum(user_sip.current_value for user_sip in users_in_sip)
+            total_gain = current_value - total_investment
             queryset = UserPurchaseOrderDetails.objects.filter(user=pk)
             user_personal_detail = User.objects.get(id=pk)
             instances = queryset.all()
             serializer = UserPurchaseOrderSerializer(instances, many=True)
-
-            # Get the list of SIP IDs from the serializer data
-            sips_list = [item["sips"] for item in serializer.data]
-
-            # Retrieve SIP_DETAILS objects for each SIP
-            sips_details = [SIP_DETAILS.objects.filter(sip=item) for item in sips_list]
-
-            # Calculate current_value and gain_value for each SIP_DETAILS
-            current_values = [
-                sip_detail.current_value
-                for sip_detail_list in sips_details
-                for sip_detail in sip_detail_list
-            ]
-            gain_values = [
-                sip_detail.gain_value
-                for sip_detail_list in sips_details
-                for sip_detail in sip_detail_list
-            ]
-
-            # Assign current_value and gain_value to each item in serializer data
-            for i, item in enumerate(serializer.data):
-                item["current_value"] = current_values[i]
-                item["gain_value"] = gain_values[i]
-
-            # Calculate total_current_value and total_invested_amount
-            total_current_value = sum(current_values)
-            total_invested_amount_of_user = [
-                item["invested_amount"] for item in serializer.data
-            ]
-            total_invested_amount = sum(total_invested_amount_of_user)
-
             # Get user profile photo URL
             profile_photo_url = (
                 user_personal_detail.profile_photo.url
@@ -658,8 +630,9 @@ class GetUserSipPurchaseDetailthroughId(APIView):
                     "username": user_personal_detail.username,
                     "email": user_personal_detail.email,
                     "kyc_status": user_personal_detail.verification,
-                    "total_current_value": total_current_value,
-                    "total_investment": total_invested_amount,
+                    "total_current_value": current_value,
+                    "total_investment": total_investment,
+                    "total_gain": total_gain,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -668,3 +641,41 @@ class GetUserSipPurchaseDetailthroughId(APIView):
                 {"success": False, "msg": " user doesn't exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+
+# change current value of user's sip
+
+
+class ChangeUserSipCurrentValue(APIView):
+    renderer_classes = [UserRenderers]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk, format=None):
+        try:
+            instance = UserPurchaseOrderDetails.objects.get(pk=pk)
+            serializer = UserPurchaseOrderSerializer(
+                instance, data=request.data, partial=True
+            )
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+
+                # Manually fetch logs associated with the instance
+                logs = PreviousCurrentValueLog.objects.filter(
+                    user_purchase_order=instance
+                )
+                logs_serializer = PreviousCurrentValueLogSerializer(logs, many=True)
+
+                # Add logs data to the serialized data
+                serialized_data = serializer.data
+                serialized_data["logs"] = logs_serializer.data
+
+                return Response(
+                    {
+                        "success": True,
+                        "data": serialized_data,
+                        "msg": "current value is changed successfully",
+                    },
+                    status=status.HTTP_200_OK,
+                )
+        except UserPurchaseOrderDetails.DoesNotExist:
+            raise NotFound(detail="User sip doesn't exist")

@@ -1,7 +1,7 @@
 # admin.py
 
 from django.contrib import admin
-from .models import SIP, SIP_DETAILS
+from .models import SIP
 
 
 class SIPAdmin(admin.ModelAdmin):
@@ -16,23 +16,9 @@ class SIPAdmin(admin.ModelAdmin):
         "annual_return_rate",
         "min_amount",
         "description",
+        "time_period",
+       
     ]
 
 
 admin.site.register(SIP, SIPAdmin)
-
-
-class SIPDetailsAdmin(admin.ModelAdmin):
-    list_display = [
-        "id",
-        "no_of_investors",
-        "min_amount",
-        "current_value",
-        "total_investment",
-        "time_period",
-        "sip",
-        "gain_value",
-    ]
-
-
-admin.site.register(SIP_DETAILS, SIPDetailsAdmin)
