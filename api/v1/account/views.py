@@ -509,25 +509,33 @@ class ChangeUserSipDetails(APIView):
 
     def patch(self, request, pk, format=None):
         try:
-            data = UserPurchaseOrderDetails.objects.get(pk=pk)
+            instance = UserPurchaseOrderDetails.objects.get(pk=pk)
             serializer = UserPurchaseOrderSerializer(
-                data, data=request.data, partial=True
+                instance, data=request.data, partial=True
             )
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+
+                # Manually fetch logs associated with the instance
+                logs = PreviousCurrentValueLog.objects.filter(
+                    user_purchase_order=instance
+                )
+                logs_serializer = PreviousCurrentValueLogSerializer(logs, many=True)
+
+                # Add logs data to the serialized data
+                serialized_data = serializer.data
+                serialized_data["logs"] = logs_serializer.data
+
                 return Response(
                     {
                         "success": True,
-                        "data": serializer.data,
-                        "msg": "user sip order info is changed successfully",
+                        "data": serialized_data,
+                        "msg": "current value is changed successfully",
                     },
                     status=status.HTTP_200_OK,
                 )
         except UserPurchaseOrderDetails.DoesNotExist:
-            return Response(
-                {"success": False, "msg": " user sip doesn't exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            raise NotFound(detail="User sip doesn't exist")
 
     def delete(self, request, pk, format=None):
         data = UserPurchaseOrderDetails.objects.get(pk=pk)
