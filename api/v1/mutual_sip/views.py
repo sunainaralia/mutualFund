@@ -13,7 +13,7 @@ from api.v1.account.models import UserPurchaseOrderDetails
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .consumers import SIPConsumer
-
+from api.v1.account.serializers import UserPurchaseOrderSerializer
 
 class PostSip(APIView):
     renderer_classes = [UserRenderers]
@@ -50,7 +50,6 @@ class GetAllSip(APIView):
 # # change user's sip details
 class ChangeSip(APIView):
     renderer_classes = [UserRenderers]
-
     def patch(self, request, pk, format=None):
         try:
             data = SIP.objects.get(pk=pk)
@@ -101,6 +100,7 @@ class ChangeSip(APIView):
                 (total_gain / total_investment) * 100 if total_investment != 0 else 0
             )
             serializer = SIPSerializer(data)
+            users_serializer = UserPurchaseOrderSerializer(users_in_sip, many=True)
 
             # Add additional calculated data to serializer data
             serializer_data = serializer.data
@@ -109,6 +109,7 @@ class ChangeSip(APIView):
             serializer_data["total_gain"] = total_gain
             serializer_data["gain_percentage"] = gain_percentage
             serializer_data["current_value"] = current_value
+            serializer_data["users"] = users_serializer.data
             return Response(
                 {"success": True, "data": serializer_data}, status=status.HTTP_200_OK
             )
@@ -117,22 +118,3 @@ class ChangeSip(APIView):
                 {"success": False, "msg": "SIP doesn't exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
-
-# post sip
-
-class PostSips(APIView):
-    renderer_classes = [UserRenderers]
-
-    def post(self, request, format=None):
-        serializer = SIPSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(
-            {
-                "success": True,
-                "msg": "SIP is saved successfully",
-                "data": serializer.data,
-            },
-            status=status.HTTP_201_CREATED,
-        )
