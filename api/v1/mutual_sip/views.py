@@ -15,6 +15,7 @@ from asgiref.sync import async_to_sync
 from .consumers import SIPConsumer
 from api.v1.account.serializers import UserPurchaseOrderSerializer
 
+
 class PostSip(APIView):
     renderer_classes = [UserRenderers]
 
@@ -50,6 +51,7 @@ class GetAllSip(APIView):
 # # change user's sip details
 class ChangeSip(APIView):
     renderer_classes = [UserRenderers]
+
     def patch(self, request, pk, format=None):
         try:
             data = SIP.objects.get(pk=pk)
@@ -92,10 +94,8 @@ class ChangeSip(APIView):
             total_investment = sum(
                 user_sip.invested_amount for user_sip in users_in_sip
             )
-            current_value = sum(
-                user_sip.current_value for user_sip in users_in_sip
-            )
-            total_gain =current_value - total_investment
+            current_value = sum(user_sip.current_value for user_sip in users_in_sip)
+            total_gain = current_value - total_investment
             gain_percentage = (
                 (total_gain / total_investment) * 100 if total_investment != 0 else 0
             )
@@ -118,3 +118,6 @@ class ChangeSip(APIView):
                 {"success": False, "msg": "SIP doesn't exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+
+

@@ -6,7 +6,7 @@ from .models import (
     PanVerification,
     AdharCardVerify,
     UserPurchaseOrderDetails,
-    PreviousCurrentValueLog
+    PreviousCurrentValueLog,
 )
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -31,6 +31,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             "profile_photo",
             "is_blocked",
             "verification",
+            "created_at",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -141,6 +142,7 @@ class UserBasicDetailSerializer(serializers.ModelSerializer):
             "state",
             "user",
             "verification",
+            "city",
         ]
 
 
@@ -189,9 +191,7 @@ class SipSerializer(serializers.ModelSerializer):
             "sip_status",
             "gain_value",
             "sip_photo",
-           
         ]
-
 
 
 class PreviousCurrentValueLogSerializer(serializers.ModelSerializer):
@@ -230,6 +230,8 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
 class UserDetailsSerializer(serializers.ModelSerializer):
     state = serializers.SerializerMethodField()
     invested_amount = serializers.SerializerMethodField()
+    city = serializers.SerializerMethodField()
+    member_status = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -242,11 +244,21 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             "state",
             "is_blocked",
             "invested_amount",
+            "city",
+            "member_status",
         ]
 
     def get_state(self, obj):
         user_basic_detail = obj.userbasicdetail.first()
         return user_basic_detail.state if user_basic_detail else None
+
+    def get_city(self, obj):
+        user_basic_detail = obj.userbasicdetail.first()
+        return user_basic_detail.city if user_basic_detail else None
+
+    def get_member_status(self, obj):
+        user_basic_detail = UserPurchaseOrderDetails.objects.filter(user=obj).first()
+        return user_basic_detail.member_status if user_basic_detail else None
 
     def get_invested_amount(self, obj):
         total_invested_amount = (

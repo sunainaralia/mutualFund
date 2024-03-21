@@ -38,6 +38,20 @@ class GetTransactionView(APIView):
             )
 
 
+class GetAllTransactions(APIView):
+    renderer_classes = [UserRenderers]
+
+    def get(self, request, format=None):
+        data = Transactions.objects.all()
+        if data:
+            serializer = TransactionSerializer(data, many=True)
+            return Response(
+                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+            )
+        else:
+            return Response({"success": False}, status=status.HTTP_204_NO_CONTENT)
+
+
 class GetTransactionThroughUserId(APIView):
     def get(self, request, pk=None, format=None):
         try:

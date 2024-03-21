@@ -649,41 +649,23 @@ class GetUserSipPurchaseDetailthroughId(APIView):
                 {"success": False, "msg": " user doesn't exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
-
-# change current value of user's sip
-
-
-class ChangeUserSipCurrentValue(APIView):
-    renderer_classes = [UserRenderers]
-    permission_classes = [IsAuthenticated]
-
-    def patch(self, request, pk, format=None):
+        
+        
+class GetUserAllPersonlDetails(APIView):
+    def get(self, request, format=None):
         try:
-            instance = UserPurchaseOrderDetails.objects.get(pk=pk)
-            serializer = UserPurchaseOrderSerializer(
-                instance, data=request.data, partial=True
+            # Fetch all users
+            all_users = User.objects.all()
+
+            # Serialize user details for each user
+            user_details = UserDetailsSerializer(all_users, many=True).data
+
+            # Return response
+            return Response(
+                {"success": True, "data": user_details}, status=status.HTTP_200_OK
             )
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-
-                # Manually fetch logs associated with the instance
-                logs = PreviousCurrentValueLog.objects.filter(
-                    user_purchase_order=instance
-                )
-                logs_serializer = PreviousCurrentValueLogSerializer(logs, many=True)
-
-                # Add logs data to the serialized data
-                serialized_data = serializer.data
-                serialized_data["logs"] = logs_serializer.data
-
-                return Response(
-                    {
-                        "success": True,
-                        "data": serialized_data,
-                        "msg": "current value is changed successfully",
-                    },
-                    status=status.HTTP_200_OK,
-                )
-        except UserPurchaseOrderDetails.DoesNotExist:
-            raise NotFound(detail="User sip doesn't exist")
+        except Exception as e:
+            return Response(
+                {"success": False, "msg": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
