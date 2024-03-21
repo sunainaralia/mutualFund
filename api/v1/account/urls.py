@@ -24,6 +24,7 @@ from api.v1.account.views import (
     UserAllDetailsAPIView,
     GetUserSipPurchaseDetailthroughId,
     GetUserAllPersonlDetails,
+    GetUserAllDetailsThroughUserId,
 )
 
 urlpatterns = [
@@ -56,5 +57,6 @@ urlpatterns = [
         "GetUserSipPurchaseDetailthroughId/<pk>/",
         GetUserSipPurchaseDetailthroughId.as_view(),
     ),
-    path("UserAllDetails/", GetUserAllPersonlDetails.as_view()),
+    path("allUserAllDetails/", GetUserAllPersonlDetails.as_view()),
+    path("usersAllDetailsThroughUserId/<pk>/", GetUserAllDetailsThroughUserId.as_view()),
 ]

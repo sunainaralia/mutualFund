@@ -12,7 +12,9 @@ class TransactionAdmin(admin.ModelAdmin):
         "user",
         "transaction_type",
         "amount",
-        "transaction_id"
+        "transaction_id",
+        "status",
+        "sip"
     ]
 
 

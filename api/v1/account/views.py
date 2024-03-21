@@ -11,7 +11,7 @@ from .models import (
     AdharCardVerify,
     SIP,
     UserPurchaseOrderDetails,
-    PreviousCurrentValueLog
+    PreviousCurrentValueLog,
 )
 from .serializers import (
     UserRegistrationSerializer,
@@ -26,7 +26,7 @@ from .serializers import (
     UserPurchaseOrderSerializer,
     UserDetailsSerializer,
     UserAllDetailsSerializer,
-    PreviousCurrentValueLogSerializer
+    PreviousCurrentValueLogSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -34,6 +34,9 @@ from rest_framework.authentication import authenticate
 from .renderers import UserRenderers
 from rest_framework.permissions import IsAuthenticated
 from api.v1.mutual_sip.models import SIP
+from api.v1.mutual_sip.serializers import SIPSerializer
+from api.v1.payment.models import Transactions
+from api.v1.payment.serializers import TransactionSerializer
 
 
 # jwt token
@@ -68,6 +71,7 @@ class UserRegistration(APIView):
 # user login
 class UserLogin(APIView):
     renderer_classes = [UserRenderers]
+
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -591,6 +595,7 @@ class UserDetailsAPIView(ListAPIView):
         return queryset
 
 
+# user's all details
 class UserAllDetailsAPIView(APIView):
     renderer_classes = [UserRenderers]
 
@@ -608,6 +613,7 @@ class UserAllDetailsAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# get all details of user through purchase id
 class GetUserSipPurchaseDetailthroughId(APIView):
     renderer_classes = [UserRenderers]
 
@@ -649,8 +655,9 @@ class GetUserSipPurchaseDetailthroughId(APIView):
                 {"success": False, "msg": " user doesn't exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        
+
+
+# get all details of all user
 class GetUserAllPersonlDetails(APIView):
     def get(self, request, format=None):
         try:
@@ -663,6 +670,61 @@ class GetUserAllPersonlDetails(APIView):
             # Return response
             return Response(
                 {"success": True, "data": user_details}, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"success": False, "msg": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+# get a single user's all details
+
+
+class GetUserAllDetailsThroughUserId(APIView):
+    def get(self, request, pk=None, format=None):
+        try:
+            # Fetch the user based on the provided pk
+            user = User.objects.get(pk=pk)
+            sip_details = UserPurchaseOrderDetails.objects.filter(user=user)
+
+            # Serialize user details
+            user_details = UserDetailsSerializer(user).data
+            profit = user_details.get("current_value", 0) - user_details.get(
+                "invested_amount", 0
+            )
+            user_details["profit"] = profit
+
+            # Fetch unique SIP details for each purchase order
+            sip_data = set()
+            for sip in sip_details:
+                sip_data.add(
+                    SIPSerializer(sip.sips).data["id"]
+                )  # Add SIP IDs to the set
+
+            # Fetch SIP details for the unique SIP IDs
+            unique_sips = []
+            for sip_id in sip_data:
+                sip = SIP.objects.get(id=sip_id)
+                unique_sips.append(SIPSerializer(sip).data)
+            queryset = Transactions.objects.filter(user=pk)
+            instances = queryset.all()
+            serializer = TransactionSerializer(instances, many=True)
+
+            # Return response
+            return Response(
+                {
+                    "success": True,
+                    "user_details": user_details,
+                    "sips": unique_sips,
+                    "transactions": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response(
+                {"success": False, "msg": "User with the provided id does not exist."},
+                status=status.HTTP_404_NOT_FOUND,
             )
         except Exception as e:
             return Response(

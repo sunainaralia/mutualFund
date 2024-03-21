@@ -232,6 +232,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     invested_amount = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     member_status = serializers.SerializerMethodField()
+    current_value=serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -246,6 +247,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             "invested_amount",
             "city",
             "member_status",
+            "phone_no",
+            "current_value",
         ]
 
     def get_state(self, obj):
@@ -268,6 +271,15 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             or 0.0
         )
         return total_invested_amount
+
+    def get_current_value(self, obj):
+        total_current_value = (
+            UserPurchaseOrderDetails.objects.filter(user=obj).aggregate(
+                models.Sum("current_value")
+            )["current_value__sum"]
+            or 0.0
+        )
+        return total_current_value
 
 
 # serializers for comlete user details

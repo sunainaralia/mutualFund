@@ -1,16 +1,23 @@
 from django.db import models
 from api.v1.account.models import User
+from api.v1.mutual_sip.models import SIP
 
 
 # Create your models here.
 class Transactions(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transaction",blank=True)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="transaction", blank=True
+    )
     invoice = models.CharField(max_length=100)
     date_of_transaction = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     transaction_type = models.CharField(max_length=100, null=True, blank=True)
     amount = models.IntegerField(default=0.0, blank=True)
-    transaction_id=models.IntegerField(blank=True)
+    transaction_id = models.IntegerField(blank=True)
+    sip = models.ForeignKey(
+        SIP, on_delete=models.CASCADE, related_name="sip_transactions", blank=True,null=True
+    )
+    status=models.CharField(max_length=100,null=True,blank=True)
 
     def save(self, *args, **kwargs):
         # If the object is new and transaction_id is not provided, set it to the id
