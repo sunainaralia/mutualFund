@@ -19,6 +19,7 @@ class SIP(models.Model):
     min_amount = models.IntegerField(blank=True, default=0.0, null=True)
     description = models.CharField(max_length=1000, null=True)
     time_period = models.IntegerField(null=True,blank=True)
+    
 
 
 

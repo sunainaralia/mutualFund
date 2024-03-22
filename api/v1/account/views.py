@@ -509,7 +509,6 @@ class GetAllUserSipDetail(APIView):
 # change user's order details
 class ChangeUserSipDetails(APIView):
     renderer_classes = [UserRenderers]
-    permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk, format=None):
         try:
