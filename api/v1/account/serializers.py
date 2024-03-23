@@ -191,6 +191,7 @@ class SipSerializer(serializers.ModelSerializer):
             "sip_status",
             "gain_value",
             "sip_photo",
+
         ]
 
 
@@ -221,6 +222,7 @@ class UserPurchaseOrderSerializer(serializers.ModelSerializer):
             "date_of_purchase",
             "current_value",
             "logs",
+            "payment_type",
         ]
 
 
@@ -249,6 +251,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             "member_status",
             "phone_no",
             "current_value",
+            
         ]
 
     def get_state(self, obj):

@@ -104,6 +104,7 @@ class UserSipOrderAdmin(admin.ModelAdmin):
         "no_of_installment",
         "sip_type",
         "current_value",
+        "payment_type"
     ]
 
 

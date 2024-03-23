@@ -140,6 +140,7 @@ class UserPurchaseOrderDetails(models.Model):
     installment_date = models.IntegerField(blank=True, null=True)
     no_of_installment = models.IntegerField(blank=True, null=True)
     current_value = models.FloatField(blank=True)
+    payment_type=models.CharField(max_length=200,null=True,blank=True)
 
     def save(self, *args, **kwargs):
         if not self.current_value:

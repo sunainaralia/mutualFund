@@ -1,26 +1,8 @@
 # api/transactions/serializers.py
 from rest_framework import serializers
 from .models import Transactions
-from api.v1.account.models import User
+from api.v1.account.models import User,UserPurchaseOrderDetails
 from api.v1.mutual_sip.models import SIP
-
-class TransactionSerializers(serializers.ModelSerializer):
-    # notification_sent = serializers.BooleanField(default=False, read_only=True)
-
-    class Meta:
-        model = Transactions
-        fields = (
-            "id",
-            "title",
-            "date_of_transaction",
-            "invoice",
-            "user",
-            "transaction_type",
-            "amount",
-            "transaction_id",
-            "status",
-            "sip"
-        )
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -62,4 +44,14 @@ class TransactionSerializer(serializers.ModelSerializer):
         return obj.user.username if obj.user else None
 
     def get_sip_name(self, obj):
-        return obj.sip.sip_name if obj.sip else None
+        return obj.sip.name if obj.sip else None
+
+    def validate(self, data):
+        user = data.get("user")
+        sip = data.get("sip")
+
+        # Check if the user has purchased the SIP
+        if not UserPurchaseOrderDetails.objects.filter(user=user, sips=sip).exists():
+            raise serializers.ValidationError("The user has not purchased this SIP.")
+
+        return data
