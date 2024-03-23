@@ -35,16 +35,42 @@ class PostSip(APIView):
 
 
 # # get all sip
+# class GetAllSip(APIView):
+#     renderer_classes = [UserRenderers]
+
+#     def get(self, request, format=None):
+#         data = SIP.objects.all()
+#         if data:
+#             serializer = SIPSerializer(data, many=True)
+#             return Response(
+#                 {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+#             )
+#         else:
+#             return Response({"success": False}, status=status.HTTP_204_NO_CONTENT)
+from django.db.models import Sum, Count
+
+
 class GetAllSip(APIView):
     renderer_classes = [UserRenderers]
 
     def get(self, request, format=None):
-        data = SIP.objects.all()
-        if data:
-            serializer = SIPSerializer(data, many=True)
-            return Response(
-                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+        sips_with_details = SIP.objects.prefetch_related("user_purchase_order_details")
+        data = []
+        for sip in sips_with_details:
+            total_investment = (
+                sip.user_purchase_order_details.aggregate(
+                    total_investment=Sum("invested_amount")
+                )["total_investment"]
+                or 0
             )
+            total_investors = sip.user_purchase_order_details.count()
+            serialized_sip = SIPSerializer(sip).data
+            serialized_sip["total_investment"] = total_investment
+            serialized_sip["total_investors"] = total_investors
+            data.append(serialized_sip)
+
+        if data:
+            return Response({"success": True, "data": data}, status=status.HTTP_200_OK)
         else:
             return Response({"success": False}, status=status.HTTP_204_NO_CONTENT)
 
