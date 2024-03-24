@@ -694,18 +694,24 @@ class GetUserAllDetailsThroughUserId(APIView):
             )
             user_details["profit"] = profit
 
-            # Fetch unique SIP details for each purchase order
-            sip_data = set()
-            for sip in sip_details:
-                sip_data.add(
-                    SIPSerializer(sip.sips).data["id"]
-                )  # Add SIP IDs to the set
+            # Initialize dictionary to store SIP details
+            sip_data_dict = {}
 
-            # Fetch SIP details for the unique SIP IDs
-            unique_sips = []
-            for sip_id in sip_data:
-                sip = SIP.objects.get(id=sip_id)
-                unique_sips.append(SIPSerializer(sip).data)
+            # Fetch SIP details for each purchase order
+            for sip_detail in sip_details:
+                sip = sip_detail.sips
+                total_investment = sip_detail.invested_amount
+                current_value = sip_detail.current_value
+
+                # Serialize SIP details
+                sip_data = SIPSerializer(sip).data
+                sip_data["total_investment"] = total_investment
+                sip_data["current_value"] = current_value
+                sip_data["total_gain"]=current_value-total_investment
+
+                # Add SIP details to dictionary
+                sip_data_dict[sip.id] = sip_data
+
             queryset = Transactions.objects.filter(user=pk)
             instances = queryset.all()
             serializer = TransactionSerializer(instances, many=True)
@@ -715,7 +721,7 @@ class GetUserAllDetailsThroughUserId(APIView):
                 {
                     "success": True,
                     "user_details": user_details,
-                    "sips": unique_sips,
+                    "sips": list(sip_data_dict.values()),
                     "transactions": serializer.data,
                 },
                 status=status.HTTP_200_OK,

@@ -236,6 +236,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     member_status = serializers.SerializerMethodField()
     current_value=serializers.SerializerMethodField()
     kyc_status = serializers.SerializerMethodField()
+    portfolio_no=serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -252,8 +253,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             "member_status",
             "phone_no",
             "current_value",
-            "kyc_status"
-            
+            "kyc_status",
+            "portfolio_no",
         ]
 
     def get_state(self, obj):
@@ -288,6 +289,10 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     def get_kyc_status(self,obj):
         user_basic_detail = obj.userbasicdetail.first()
         return user_basic_detail.verification if user_basic_detail else None
+    def get_portfolio_no(self,obj):
+        user_basic_detail = UserPurchaseOrderDetails.objects.filter(user=obj).first()
+        return user_basic_detail.portfolio_no if user_basic_detail else None
+
 
 
 # serializers for comlete user details
