@@ -18,4 +18,4 @@ urlpatterns = [
     path("user/", include("api.v1.account.urls")),
     path("api/", include("api.v1.mutual_sip.urls")),
     path("payment/", include("api.v1.payment.urls")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

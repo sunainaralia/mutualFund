@@ -12,7 +12,6 @@ from rest_framework.permissions import IsAuthenticated
 from api.v1.account.models import UserPurchaseOrderDetails
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from .consumers import SIPConsumer
 from api.v1.account.serializers import UserPurchaseOrderSerializer
 from api.v1.account.models import User
 from datetime import datetime, timedelta

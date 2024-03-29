@@ -48,9 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=20)
     password = models.CharField(max_length=100)
     is_admin = models.BooleanField(default=False)
-    profile_photo = models.ImageField(
-        upload_to="user_image", max_length=300, null=True, blank=True
-    )
+    profile_photo = models.CharField(max_length=100, null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -85,7 +83,7 @@ class UserBasicDetail(models.Model):
     zip_code = models.CharField(max_length=10)
     state = models.CharField(max_length=20)
     verification = models.CharField(max_length=100, null=True, blank=True)
-    city=models.CharField(max_length=100,null=True,blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
 
     REQUIRED_FIELDS = [
         "nationality",
@@ -96,26 +94,27 @@ class UserBasicDetail(models.Model):
         "zip_code",
         "state",
         "user",
-        "city"
+        "city",
     ]
 
 
 # Pan verfication
 class PanVerification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    pan_card = models.ImageField(upload_to="user_image", max_length=5000)
+    pan_card = models.CharField(max_length=100, null=True, blank=True)
     pan_no = models.CharField(max_length=10)
 
 
 # adhar card verification
 class AdharCardVerify(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    adhar_card_front = models.ImageField(upload_to="user_image", max_length=5000)
-    adhar_card_back = models.ImageField(upload_to="user_image", max_length=5000)
+    adhar_card_front = models.CharField(max_length=100, null=True, blank=True)
+    adhar_card_back = models.CharField(max_length=100, null=True, blank=True)
     adhar_no = models.CharField(max_length=12)
 
 
 # purchase order of sip
+
 
 class UserPurchaseOrderDetails(models.Model):
     user = models.ForeignKey(
@@ -140,7 +139,7 @@ class UserPurchaseOrderDetails(models.Model):
     installment_date = models.IntegerField(blank=True, null=True)
     no_of_installment = models.IntegerField(blank=True, null=True)
     current_value = models.FloatField(blank=True)
-    payment_type=models.CharField(max_length=200,null=True,blank=True)
+    payment_type = models.CharField(max_length=200, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.current_value:

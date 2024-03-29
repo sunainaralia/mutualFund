@@ -15,11 +15,7 @@ class SIP(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     investment_type = models.CharField(max_length=100, blank=True, null=True)
     sip_status = models.CharField(max_length=100, default="active")
-    sip_photo = models.ImageField(upload_to="user_image", max_length=300, null=True)
+    sip_photo = models.CharField(max_length=100, null=True, blank=True)
     min_amount = models.IntegerField(blank=True, default=0.0, null=True)
     description = models.CharField(max_length=1000, null=True)
     time_period = models.IntegerField(null=True,blank=True)
-    
-
-
-
